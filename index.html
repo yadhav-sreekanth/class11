@@ -1,0 +1,2445 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Class 11 — Personal Dashboard | Yadhav Sreekanth</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+        rel="stylesheet" />
+    <style>
+        /* ============== RESET / BASE ============== */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background .6s ease, color .6s ease;
+            line-height: 1.5;
+        }
+
+        /* ============== THEME TOKENS ============== */
+        :root[data-theme="dark"] {
+            --bg: #070713;
+            --bg-2: #0d0d1f;
+            --surface: rgba(255, 255, 255, 0.04);
+            --surface-2: rgba(255, 255, 255, 0.07);
+            --border: rgba(255, 255, 255, 0.10);
+            --text: #eef0ff;
+            --muted: #9aa0c5;
+            --primary: #7c5cff;
+            --primary-2: #22d3ee;
+            --accent: #ff5cf2;
+            --success: #3ddc97;
+            --warn: #ffb547;
+            --danger: #ff5d6c;
+            --grad: linear-gradient(135deg, #7c5cff 0%, #22d3ee 50%, #ff5cf2 100%);
+            --grad-soft: linear-gradient(135deg, rgba(124, 92, 255, .25), rgba(34, 211, 238, .18), rgba(255, 92, 242, .22));
+            --shadow: 0 20px 60px -20px rgba(0, 0, 0, .6);
+            --ring: 0 0 0 1px rgba(255, 255, 255, .08), 0 30px 60px -25px rgba(124, 92, 255, .35);
+        }
+
+        :root[data-theme="light"] {
+            --bg: #f6f7fb;
+            --bg-2: #eceefb;
+            --surface: rgba(255, 255, 255, 0.7);
+            --surface-2: rgba(255, 255, 255, 0.9);
+            --border: rgba(20, 20, 40, 0.08);
+            --text: #10122b;
+            --muted: #555a85;
+            --primary: #6244ff;
+            --primary-2: #0ea5b7;
+            --accent: #d63bcb;
+            --success: #10b981;
+            --warn: #f59e0b;
+            --danger: #ef4444;
+            --grad: linear-gradient(135deg, #6244ff 0%, #0ea5b7 50%, #d63bcb 100%);
+            --grad-soft: linear-gradient(135deg, rgba(98, 68, 255, .15), rgba(14, 165, 183, .12), rgba(214, 59, 203, .15));
+            --shadow: 0 20px 60px -25px rgba(20, 20, 60, .25);
+            --ring: 0 0 0 1px rgba(20, 20, 40, .06), 0 25px 50px -25px rgba(98, 68, 255, .3);
+        }
+
+        /* ============== BACKGROUND BLOBS ============== */
+        .bg-blobs {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: .55;
+            animation: float 18s ease-in-out infinite
+        }
+
+        .blob.b1 {
+            width: 520px;
+            height: 520px;
+            background: #7c5cff;
+            top: -150px;
+            left: -120px
+        }
+
+        .blob.b2 {
+            width: 420px;
+            height: 420px;
+            background: #22d3ee;
+            top: 30%;
+            right: -120px;
+            animation-delay: -6s
+        }
+
+        .blob.b3 {
+            width: 480px;
+            height: 480px;
+            background: #ff5cf2;
+            bottom: -150px;
+            left: 25%;
+            animation-delay: -12s
+        }
+
+        :root[data-theme="light"] .blob {
+            opacity: .35
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1)
+            }
+
+            33% {
+                transform: translate(40px, -30px) scale(1.08)
+            }
+
+            66% {
+                transform: translate(-30px, 40px) scale(.95)
+            }
+        }
+
+        /* ============== LAYOUT ============== */
+        .container {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 24px
+        }
+
+        .glass {
+            background: var(--surface);
+            backdrop-filter: blur(22px) saturate(140%);
+            -webkit-backdrop-filter: blur(22px) saturate(140%);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .section {
+            margin: 36px 0
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 16px
+        }
+
+        .section-title i {
+            color: var(--primary-2)
+        }
+
+        .section-title .pill {
+            margin-left: auto;
+            font-size: .7rem;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: var(--surface-2);
+            color: var(--muted);
+            border: 1px solid var(--border)
+        }
+
+        /* ============== HEADER ============== */
+        header.app-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(20px);
+            background: color-mix(in oklab, var(--bg) 70%, transparent);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 14px 24px;
+            max-width: 1320px;
+            margin: 0 auto
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px
+        }
+
+        .brand-mark {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: var(--grad);
+            color: #fff;
+            font-weight: 800;
+            font-family: 'Space Grotesk';
+            font-size: 1.05rem;
+            box-shadow: 0 10px 30px -10px rgba(124, 92, 255, .6);
+        }
+
+        .brand-text h1 {
+            font-family: 'Space Grotesk';
+            font-size: 1.25rem;
+            letter-spacing: .5px;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent
+        }
+
+        .brand-text p {
+            font-size: .78rem;
+            color: var(--muted)
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .icon-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            cursor: pointer;
+            transition: .25s ease;
+        }
+
+        .icon-btn:hover {
+            transform: translateY(-2px);
+            background: var(--surface-2);
+            box-shadow: var(--shadow)
+        }
+
+        .clock {
+            font-family: 'Space Grotesk';
+            font-size: .85rem;
+            color: var(--muted);
+            padding: 8px 14px;
+            border-radius: 10px;
+            background: var(--surface);
+            border: 1px solid var(--border)
+        }
+
+        /* ============== HERO ============== */
+        .hero {
+            position: relative;
+            overflow: hidden;
+            padding: 40px 32px;
+            border-radius: 28px;
+            background: var(--grad-soft);
+            border: 1px solid var(--border);
+            margin-bottom: 32px;
+        }
+
+        .hero h2 {
+            font-family: 'Space Grotesk';
+            font-size: clamp(2rem, 4.5vw, 3.4rem);
+            line-height: 1.05;
+            letter-spacing: -1px
+        }
+
+        .hero h2 .grad {
+            background: var(--grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent
+        }
+
+        .hero p.sub {
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 1.05rem;
+            max-width: 680px
+        }
+
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 22px
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            font-size: .82rem;
+            color: var(--text);
+        }
+
+        .chip i {
+            color: var(--primary-2)
+        }
+
+        /* ============== SUBJECT NAV ============== */
+        .subjects-nav {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .subject-card {
+            position: relative;
+            padding: 22px;
+            border-radius: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            text-decoration: none;
+            color: inherit;
+            overflow: hidden;
+            transition: transform .35s cubic-bezier(.2, .8, .2, 1), box-shadow .35s;
+            cursor: pointer;
+            isolation: isolate;
+        }
+
+        .subject-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            opacity: .0;
+            background: var(--card-grad, var(--grad));
+            transition: opacity .4s ease;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-8px) rotateX(4deg) rotateY(-2deg);
+            box-shadow: var(--ring)
+        }
+
+        .subject-card:hover::before {
+            opacity: .18
+        }
+
+        .subject-card .sc-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        .subject-card .ic {
+            width: 54px;
+            height: 54px;
+            border-radius: 16px;
+            display: grid;
+            place-items: center;
+            color: #fff;
+            font-size: 1.3rem;
+            background: var(--card-grad, var(--grad));
+            box-shadow: 0 12px 30px -10px rgba(0, 0, 0, .4);
+        }
+
+        .subject-card h3 {
+            margin-top: 18px;
+            font-size: 1.15rem;
+            font-weight: 700
+        }
+
+        .subject-card .meta {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: .82rem
+        }
+
+        .sc-progress {
+            margin-top: 16px
+        }
+
+        .sc-bar {
+            height: 8px;
+            border-radius: 999px;
+            background: var(--surface-2);
+            overflow: hidden;
+            position: relative
+        }
+
+        .sc-bar>span {
+            display: block;
+            height: 100%;
+            border-radius: 999px;
+            background: var(--card-grad, var(--grad));
+            width: 0;
+            transition: width 1.2s cubic-bezier(.2, .8, .2, 1)
+        }
+
+        .sc-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: .78rem;
+            margin-top: 8px;
+            color: var(--muted)
+        }
+
+        .sc-row b {
+            color: var(--text)
+        }
+
+        /* subject colors */
+        .subject-card[data-subject="physics"] {
+            --card-grad: linear-gradient(135deg, #7c5cff, #22d3ee)
+        }
+
+        .subject-card[data-subject="maths"] {
+            --card-grad: linear-gradient(135deg, #ff5cf2, #7c5cff)
+        }
+
+        .subject-card[data-subject="chemistry"] {
+            --card-grad: linear-gradient(135deg, #3ddc97, #22d3ee)
+        }
+
+        .subject-card[data-subject="cs"] {
+            --card-grad: linear-gradient(135deg, #ffb547, #ff5d6c)
+        }
+
+        .subject-card[data-subject="english"] {
+            --card-grad: linear-gradient(135deg, #22d3ee, #3ddc97)
+        }
+
+        /* ============== STATS GRID ============== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px
+        }
+
+        .stat {
+            padding: 18px;
+            border-radius: 18px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: .3s;
+        }
+
+        .stat:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow)
+        }
+
+        .stat .ic {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            color: #fff;
+            background: var(--grad);
+            font-size: 1.05rem
+        }
+
+        .stat .num {
+            font-family: 'Space Grotesk';
+            font-size: 1.6rem;
+            font-weight: 700;
+            line-height: 1
+        }
+
+        .stat .lbl {
+            font-size: .78rem;
+            color: var(--muted);
+            margin-top: 4px
+        }
+
+        /* ============== OVERALL PROGRESS ============== */
+        .overall {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 28px;
+            align-items: center;
+            padding: 28px;
+            border-radius: 24px;
+            background: var(--grad-soft);
+            border: 1px solid var(--border);
+        }
+
+        .ring-wrap {
+            position: relative;
+            width: 240px;
+            height: 240px;
+            margin: auto
+        }
+
+        .ring-wrap svg {
+            transform: rotate(-90deg)
+        }
+
+        .ring-bg {
+            stroke: var(--surface-2)
+        }
+
+        .ring-fg {
+            stroke: url(#ringGrad);
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1.6s cubic-bezier(.2, .8, .2, 1)
+        }
+
+        .ring-center {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            text-align: center
+        }
+
+        .ring-center .pct {
+            font-family: 'Space Grotesk';
+            font-size: 2.6rem;
+            font-weight: 800;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent
+        }
+
+        .ring-center .lbl {
+            color: var(--muted);
+            font-size: .85rem;
+            margin-top: 2px
+        }
+
+        .overall-info h3 {
+            font-family: 'Space Grotesk';
+            font-size: 1.6rem
+        }
+
+        .overall-info p {
+            color: var(--muted);
+            margin-top: 6px
+        }
+
+        .mini-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 18px
+        }
+
+        .mini {
+            padding: 14px;
+            border-radius: 14px;
+            background: var(--surface);
+            border: 1px solid var(--border)
+        }
+
+        .mini .v {
+            font-family: 'Space Grotesk';
+            font-weight: 700;
+            font-size: 1.2rem
+        }
+
+        .mini .k {
+            font-size: .74rem;
+            color: var(--muted)
+        }
+
+        /* ============== TWO COL ============== */
+        .two-col {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px
+        }
+
+        .three-col {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px
+        }
+
+        /* ============== SUBJECT TRACKERS ============== */
+        .subject-tracker {
+            padding: 22px;
+            border-radius: 22px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            margin-bottom: 18px;
+            transition: .4s
+        }
+
+        .tracker-head {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap
+        }
+
+        .tracker-head .ic {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            color: #fff;
+            background: var(--card-grad, var(--grad))
+        }
+
+        .tracker-head h3 {
+            font-family: 'Space Grotesk';
+            font-size: 1.2rem
+        }
+
+        .tracker-head .progress-tag {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .tracker-head .progress-tag .bar {
+            width: 140px;
+            height: 8px;
+            border-radius: 999px;
+            background: var(--surface-2);
+            overflow: hidden
+        }
+
+        .tracker-head .progress-tag .bar>span {
+            display: block;
+            height: 100%;
+            background: var(--card-grad, var(--grad));
+            border-radius: 999px
+        }
+
+        .tracker-head .progress-tag b {
+            font-family: 'Space Grotesk'
+        }
+
+        .tracker-actions {
+            display: flex;
+            gap: 8px
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 14px;
+            border-radius: 11px;
+            border: 1px solid var(--border);
+            background: var(--surface-2);
+            color: var(--text);
+            cursor: pointer;
+            font: 600 .82rem 'Plus Jakarta Sans';
+            transition: .25s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow)
+        }
+
+        .btn.primary {
+            background: var(--grad);
+            color: #fff;
+            border: none
+        }
+
+        .btn.danger {
+            background: linear-gradient(135deg, #ff5d6c, #ff8a3d);
+            color: #fff;
+            border: none
+        }
+
+        .btn.ghost {
+            background: transparent
+        }
+
+        .btn.sm {
+            padding: 6px 10px;
+            font-size: .75rem
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            margin-top: 16px;
+            border-radius: 14px;
+            border: 1px solid var(--border)
+        }
+
+        table.tracker {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 880px;
+            font-size: .86rem
+        }
+
+        table.tracker th,
+        table.tracker td {
+            padding: 12px 10px;
+            text-align: center;
+            border-bottom: 1px solid var(--border)
+        }
+
+        table.tracker thead th {
+            background: var(--surface-2);
+            font-size: .74rem;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            color: var(--muted);
+            font-weight: 600
+        }
+
+        table.tracker tbody tr {
+            transition: .2s;
+            animation: rowIn .35s ease both
+        }
+
+        table.tracker tbody tr:hover {
+            background: var(--surface-2)
+        }
+
+        @keyframes rowIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        table.tracker td:first-child {
+            text-align: left;
+            font-weight: 600
+        }
+
+        .mark-input {
+            width: 64px;
+            padding: 7px 8px;
+            border-radius: 9px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            text-align: center;
+            font: 600 .82rem 'Space Grotesk'
+        }
+
+        .mark-input:focus {
+            outline: 2px solid var(--primary-2);
+            outline-offset: 1px
+        }
+
+        .checkbox {
+            width: 22px;
+            height: 22px;
+            border-radius: 7px;
+            border: 1px solid var(--border);
+            display: inline-grid;
+            place-items: center;
+            cursor: pointer;
+            background: var(--surface);
+            color: transparent;
+            transition: .25s;
+        }
+
+        .checkbox.on {
+            background: var(--grad);
+            color: #fff;
+            border-color: transparent
+        }
+
+        .add-chapter {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+            flex-wrap: wrap
+        }
+
+        .add-chapter input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 12px;
+            border-radius: 11px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text)
+        }
+
+        /* collapsed */
+        .subject-tracker.collapsed .table-wrap,
+        .subject-tracker.collapsed .add-chapter {
+            display: none
+        }
+
+        /* ============== TODO ============== */
+        .todo-form {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 14px
+        }
+
+        .todo-form input[type="text"],
+        .todo-form input[type="date"],
+        .todo-form select {
+            padding: 10px 12px;
+            border-radius: 11px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        .todo-form input[type="text"] {
+            flex: 1;
+            min-width: 180px
+        }
+
+        .todo-group h4 {
+            font-size: .85rem;
+            color: var(--muted);
+            margin: 14px 0 8px;
+            text-transform: uppercase;
+            letter-spacing: .7px
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border-radius: 13px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            margin-bottom: 8px;
+            animation: rowIn .3s ease both
+        }
+
+        .todo-item.done .title {
+            text-decoration: line-through;
+            color: var(--muted)
+        }
+
+        .todo-item .title {
+            flex: 1;
+            font-weight: 600;
+            font-size: .92rem
+        }
+
+        .todo-item .due {
+            font-size: .74rem;
+            color: var(--muted)
+        }
+
+        .pri {
+            font-size: .65rem;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .4px
+        }
+
+        .pri.high {
+            background: rgba(255, 93, 108, .18);
+            color: #ff8a95
+        }
+
+        .pri.medium {
+            background: rgba(255, 181, 71, .18);
+            color: #ffcc7d
+        }
+
+        .pri.low {
+            background: rgba(61, 220, 151, .18);
+            color: #82edbe
+        }
+
+        /* ============== EXAM MANAGER ============== */
+        .exam-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr auto;
+            gap: 8px;
+            margin-bottom: 14px
+        }
+
+        .exam-form input,
+        .exam-form select {
+            padding: 10px 12px;
+            border-radius: 11px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text)
+        }
+
+        .exam-card {
+            padding: 18px;
+            border-radius: 16px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            margin-bottom: 12px;
+            position: relative;
+            overflow: hidden;
+            animation: rowIn .35s ease both
+        }
+
+        .exam-card.next {
+            border-color: transparent;
+            background: var(--grad-soft);
+            box-shadow: 0 20px 50px -20px rgba(124, 92, 255, .5)
+        }
+
+        .exam-card .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap
+        }
+
+        .exam-card h4 {
+            font-family: 'Space Grotesk';
+            font-size: 1.05rem
+        }
+
+        .exam-card .type-tag {
+            font-size: .7rem;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--muted);
+            font-weight: 700
+        }
+
+        .countdown {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap
+        }
+
+        .cd-box {
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            min-width: 62px;
+            text-align: center
+        }
+
+        .cd-box b {
+            font-family: 'Space Grotesk';
+            font-size: 1.05rem;
+            display: block
+        }
+
+        .cd-box span {
+            font-size: .65rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .5px
+        }
+
+        .portion-section {
+            margin-top: 10px;
+            font-size: .85rem
+        }
+
+        .portion-section .grp {
+            margin-top: 6px
+        }
+
+        .portion-section .grp b {
+            color: var(--primary-2)
+        }
+
+        .portion-chip {
+            display: inline-block;
+            padding: 3px 9px;
+            border-radius: 999px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            font-size: .72rem;
+            margin: 3px 4px 0 0
+        }
+
+        .portion-picker {
+            display: none;
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            background: var(--surface);
+            border: 1px dashed var(--border)
+        }
+
+        .portion-picker.open {
+            display: block
+        }
+
+        .portion-picker .grp {
+            margin-bottom: 8px
+        }
+
+        .portion-picker .grp h5 {
+            font-size: .78rem;
+            color: var(--muted);
+            margin-bottom: 5px
+        }
+
+        .portion-picker label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-right: 10px;
+            font-size: .8rem;
+            padding: 5px 9px;
+            border-radius: 8px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            cursor: pointer
+        }
+
+        /* ============== WIDGETS ============== */
+        .widget {
+            padding: 20px;
+            border-radius: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            margin-bottom: 18px;
+            transition: .3s
+        }
+
+        .widget:hover {
+            box-shadow: var(--shadow)
+        }
+
+        .widget h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+            margin-bottom: 12px
+        }
+
+        .widget h3 i {
+            color: var(--primary-2)
+        }
+
+        /* quote */
+        .quote-box {
+            padding: 18px;
+            border-radius: 14px;
+            background: var(--grad-soft);
+            border: 1px solid var(--border);
+            font-style: italic;
+            font-size: 1rem;
+            line-height: 1.5;
+            position: relative
+        }
+
+        .quote-box::before {
+            content: "\201C";
+            position: absolute;
+            top: -10px;
+            left: 8px;
+            font-size: 4rem;
+            color: var(--primary);
+            opacity: .4;
+            font-family: 'Space Grotesk'
+        }
+
+        .quote-author {
+            margin-top: 10px;
+            font-size: .85rem;
+            color: var(--muted);
+            text-align: right;
+            font-style: normal;
+            font-weight: 600
+        }
+
+        /* weather */
+        .weather-main {
+            display: flex;
+            align-items: center;
+            gap: 18px
+        }
+
+        .weather-icon {
+            font-size: 3.6rem;
+            color: var(--primary-2);
+            animation: pulse 3s ease-in-out infinite
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1)
+            }
+
+            50% {
+                transform: scale(1.08)
+            }
+        }
+
+        .weather-temp {
+            font-family: 'Space Grotesk';
+            font-size: 2.6rem;
+            font-weight: 800;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent
+        }
+
+        .weather-cond {
+            color: var(--muted);
+            font-size: .9rem
+        }
+
+        .weather-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 14px;
+            font-size: .82rem
+        }
+
+        .weather-meta div {
+            padding: 9px 12px;
+            border-radius: 10px;
+            background: var(--surface-2);
+            border: 1px solid var(--border)
+        }
+
+        .weather-meta i {
+            color: var(--primary-2);
+            margin-right: 6px
+        }
+
+        /* news */
+        .news-item {
+            padding: 11px 12px;
+            border-radius: 11px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            margin-bottom: 8px;
+            transition: .25s
+        }
+
+        .news-item:hover {
+            transform: translateX(4px);
+            border-color: var(--primary)
+        }
+
+        .news-item a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: .9rem
+        }
+
+        .news-item .meta {
+            font-size: .72rem;
+            color: var(--muted);
+            margin-top: 4px
+        }
+
+        /* pomodoro */
+        .pomo {
+            text-align: center
+        }
+
+        .pomo-time {
+            font-family: 'Space Grotesk';
+            font-size: 3.4rem;
+            font-weight: 800;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -1px
+        }
+
+        .pomo-mode {
+            color: var(--muted);
+            font-size: .85rem;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px
+        }
+
+        .pomo-controls {
+            display: flex;
+            gap: 8px;
+            justify-content: center
+        }
+
+        /* notes */
+        #stickyNotes {
+            min-height: 140px;
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: linear-gradient(135deg, rgba(255, 222, 89, .15), rgba(255, 168, 107, .1));
+            color: var(--text);
+            font-family: inherit;
+            font-size: .9rem;
+            resize: vertical
+        }
+
+        /* streak */
+        .streak-row {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            margin-top: 8px
+        }
+
+        .streak-row div b {
+            font-family: 'Space Grotesk';
+            font-size: 1.4rem;
+            display: block;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent
+        }
+
+        .streak-row div span {
+            font-size: .7rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .5px
+        }
+
+        /* focus list */
+        .focus-list li {
+            list-style: none;
+            padding: 9px 12px;
+            border-radius: 10px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            margin-bottom: 6px;
+            font-size: .85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .focus-list li i {
+            color: var(--primary-2)
+        }
+
+        /* ============== TOAST ============== */
+        .toast-wrap {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000
+        }
+
+        .toast {
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            min-width: 240px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow);
+            animation: toastIn .4s cubic-bezier(.2, .8, .2, 1);
+            font-size: .88rem;
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success)
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--danger)
+        }
+
+        .toast.info {
+            border-left: 4px solid var(--primary-2)
+        }
+
+        @keyframes toastIn {
+            from {
+                transform: translateX(120%);
+                opacity: 0
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1
+            }
+        }
+
+        /* ============== MODAL ============== */
+        .modal-back {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .55);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            animation: fade .25s ease
+        }
+
+        .modal-back.open {
+            display: flex
+        }
+
+        @keyframes fade {
+            from {
+                opacity: 0
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        .modal {
+            padding: 28px;
+            border-radius: 22px;
+            max-width: 420px;
+            width: 90%;
+            animation: scaleIn .35s cubic-bezier(.2, .8, .2, 1)
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(.9);
+                opacity: 0
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1
+            }
+        }
+
+        .modal h3 {
+            font-family: 'Space Grotesk';
+            margin-bottom: 8px
+        }
+
+        .modal p {
+            color: var(--muted);
+            margin-bottom: 18px
+        }
+
+        .modal .row {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end
+        }
+
+        /* ============== SCROLL REVEAL ============== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity .8s ease, transform .8s ease
+        }
+
+        .reveal.in {
+            opacity: 1;
+            transform: none
+        }
+
+        /* ============== CONFETTI ============== */
+        #confetti {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 998
+        }
+
+        /* ============== RESPONSIVE ============== */
+        @media(max-width:1100px) {
+            .subjects-nav {
+                grid-template-columns: repeat(3, 1fr)
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .two-col,
+            .three-col {
+                grid-template-columns: 1fr
+            }
+
+            .overall {
+                grid-template-columns: 1fr
+            }
+
+            .exam-form {
+                grid-template-columns: 1fr 1fr
+            }
+        }
+
+        @media(max-width:640px) {
+            .subjects-nav {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .hero {
+                padding: 28px 22px
+            }
+
+            .header-inner {
+                padding: 12px 16px
+            }
+
+            .container {
+                padding: 16px
+            }
+
+            .clock {
+                display: none
+            }
+
+            .ring-wrap {
+                width: 200px;
+                height: 200px
+            }
+        }
+
+        /* scrollbars */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--surface-2);
+            border-radius: 10px
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary)
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- floating blobs -->
+    <div class="bg-blobs">
+        <div class="blob b1"></div>
+        <div class="blob b2"></div>
+        <div class="blob b3"></div>
+    </div>
+
+    <!-- header -->
+    <header class="app-header">
+        <div class="header-inner">
+            <div class="brand">
+                <div class="brand-mark">11th</div>
+                <div class="brand-text">
+                    <h1>Class 11</h1>
+                    <p>Personal Dashboard – Yadhav Sreekanth</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="clock" id="liveClock">--:--</div>
+                <button class="icon-btn" id="themeToggle" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+                <button class="icon-btn" id="scrollTopBtn" title="Top"><i class="fa-solid fa-arrow-up"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- HERO -->
+        <section class="hero reveal">
+            <h2><span class="grad">Welcome back, Yadhav.</span><br />Let's make today count.</h2>
+            <p class="sub">Track every chapter, master every test, and stay ahead of every deadline — your premium
+                command center for Class 11.</p>
+            <div class="hero-meta">
+                <span class="chip"><i class="fa-solid fa-fire"></i> Streak <b id="heroStreak">0</b> days</span>
+                <span class="chip"><i class="fa-solid fa-bullseye"></i> Daily goal <b id="heroGoal">2h</b></span>
+                <span class="chip"><i class="fa-solid fa-calendar-day"></i> <span id="heroDate"></span></span>
+                <span class="chip"><i class="fa-solid fa-bolt-lightning"></i> Focus mode ready</span>
+            </div>
+        </section>
+
+        <!-- SUBJECT NAV -->
+        <section class="section reveal">
+            <div class="section-title"><i class="fa-solid fa-book-open"></i> Subjects <span class="pill">Quick
+                    navigation</span></div>
+            <nav class="subjects-nav" id="subjectsNav"></nav>
+        </section>
+
+        <!-- OVERALL PROGRESS -->
+        <section class="section reveal">
+            <div class="overall">
+                <div class="ring-wrap">
+                    <svg width="240" height="240" viewBox="0 0 240 240">
+                        <defs>
+                            <linearGradient id="ringGrad" x1="0" x2="1" y1="0" y2="1">
+                                <stop offset="0%" stop-color="#7c5cff" />
+                                <stop offset="50%" stop-color="#22d3ee" />
+                                <stop offset="100%" stop-color="#ff5cf2" />
+                            </linearGradient>
+                        </defs>
+                        <circle class="ring-bg" cx="120" cy="120" r="100" stroke-width="18" fill="none" />
+                        <circle class="ring-fg" id="ringFg" cx="120" cy="120" r="100" stroke-width="18" fill="none"
+                            stroke-dasharray="628.3" stroke-dashoffset="628.3" />
+                    </svg>
+                    <div class="ring-center">
+                        <div class="pct" id="ringPct" style="margin-top: 55px;">0%</div>
+                        <div class="lbl"></div>
+                    </div>
+                </div>
+                <div class="overall-info">
+                    <h3>Overall Progress</h3>
+                    <p><span id="ovDone">0</span> / <span id="ovTotal">0</span> Chapters Completed · <b
+                            id="ovPct">0%</b> Complete</p>
+                    <div class="mini-stats">
+                        <div class="mini">
+                            <div class="v" id="msAvg">0</div>
+                            <div class="k">Average Marks</div>
+                        </div>
+                        <div class="mini">
+                            <div class="v" id="msBest">—</div>
+                            <div class="k">Best Subject</div>
+                        </div>
+                        <div class="mini">
+                            <div class="v" id="msWeak">—</div>
+                            <div class="k">Needs Focus</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STATS -->
+        <section class="section reveal">
+            <div class="section-title"><i class="fa-solid fa-chart-line"></i> Dashboard Statistics</div>
+            <div class="stats-grid" id="statsGrid"></div>
+        </section>
+
+        <!-- MAIN GRID -->
+        <section class="section reveal">
+            <div class="two-col">
+                <!-- Trackers -->
+                <div>
+                    <div class="section-title"><i class="fa-solid fa-list-check"></i> Chapter Trackers <span
+                            class="pill" id="trackersHint">Sorted by completion</span></div>
+                    <div id="trackersList"></div>
+                </div>
+
+                <!-- side widgets -->
+                <div>
+                    <div class="widget">
+                        <h3><i class="fa-solid fa-cloud-sun"></i> Weather <span
+                                style="margin-left:auto;font-size:.7rem;color:var(--muted)" id="weatherLoc">Kozhikode,
+                                Kerala</span></h3>
+                        <div class="weather-main">
+                            <div class="weather-icon"><i class="fa-solid fa-cloud-sun" id="weatherIcon"></i></div>
+                            <div>
+                                <div class="weather-temp" id="weatherTemp">--°</div>
+                                <div class="weather-cond" id="weatherCond">Loading…</div>
+                            </div>
+                        </div>
+                        <div class="weather-meta">
+                            <div><i class="fa-solid fa-droplet"></i> Humidity <b id="weatherHum">—</b></div>
+                            <div><i class="fa-solid fa-temperature-half"></i> Feels <b id="weatherFeel">—</b></div>
+                            <div><i class="fa-solid fa-umbrella"></i> Rain <b id="weatherRain">—</b></div>
+                            <div><i class="fa-solid fa-wind"></i> Wind <b id="weatherWind">—</b></div>
+                        </div>
+                    </div>
+
+                    <div class="widget">
+                        <h3><i class="fa-solid fa-quote-left"></i> Quote of the Day
+                            <button class="btn sm" style="margin-left:auto" onclick="refreshQuote()"><i
+                                    class="fa-solid fa-rotate"></i></button>
+                        </h3>
+                        <div class="quote-box" id="quoteBox">Loading…<div class="quote-author" id="quoteAuthor"></div>
+                        </div>
+                    </div>
+
+                    <div class="widget">
+                        <h3><i class="fa-solid fa-newspaper"></i> Current Affairs
+                            <button class="btn sm" style="margin-left:auto" onclick="loadNews()"><i
+                                    class="fa-solid fa-rotate"></i></button>
+                        </h3>
+                        <div id="newsList"></div>
+                    </div>
+
+                    <div class="widget">
+                        <h3><i class="fa-solid fa-fire-flame-curved"></i> Study Streak</h3>
+                        <div class="streak-row">
+                            <div><b id="streakCur">0</b><span>Current</span></div>
+                            <div><b id="streakBest">0</b><span>Best</span></div>
+                            <div><b id="streakGoal">2h</b><span>Daily Goal</span></div>
+                        </div>
+                        <button class="btn primary" style="margin-top:14px;width:100%" onclick="logStudyDay()"><i
+                                class="fa-solid fa-check"></i> I studied today</button>
+                    </div>
+
+                    <div class="widget">
+                        <h3><i class="fa-solid fa-clock"></i> Pomodoro Timer</h3>
+                        <div class="pomo">
+                            <div class="pomo-time" id="pomoTime">25:00</div>
+                            <div class="pomo-mode" id="pomoMode">Focus · 25/5</div>
+                            <div class="pomo-controls">
+                                <button class="btn primary" id="pomoStart"><i class="fa-solid fa-play"></i>
+                                    Start</button>
+                                <button class="btn" id="pomoReset"><i class="fa-solid fa-rotate-left"></i>
+                                    Reset</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="widget">
+                        <h3><i class="fa-solid fa-note-sticky"></i> Sticky Notes</h3>
+                        <textarea id="stickyNotes" placeholder="Quick thoughts, formulas, reminders…"></textarea>
+                    </div>
+
+                    <div class="widget">
+                        <h3><i class="fa-solid fa-bullseye"></i> Today's Focus</h3>
+                        <ul class="focus-list" id="focusList"></ul>
+                    </div>
+
+                    <div class="widget">
+                        <h3><i class="fa-solid fa-rotate"></i> Revision Reminders</h3>
+                        <ul class="focus-list" id="revisionList"></ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TODO + EXAMS -->
+        <section class="section reveal">
+            <div class="two-col">
+                <div class="glass" style="padding:22px">
+                    <div class="section-title"><i class="fa-solid fa-clipboard-list"></i> To-Do Manager</div>
+                    <form class="todo-form" id="todoForm">
+                        <input type="text" id="todoText" placeholder="What needs to be done?" required>
+                        <select id="todoPri">
+                            <option value="high">High</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                        <input type="date" id="todoDate">
+                        <button class="btn primary" type="submit"><i class="fa-solid fa-plus"></i> Add</button>
+                    </form>
+                    <div class="todo-group">
+                        <h4>Today</h4>
+                        <div id="todoToday"></div>
+                    </div>
+                    <div class="todo-group">
+                        <h4>Upcoming</h4>
+                        <div id="todoUpcoming"></div>
+                    </div>
+                    <div class="todo-group">
+                        <h4>Completed</h4>
+                        <div id="todoDone"></div>
+                    </div>
+                </div>
+
+                <div class="glass" style="padding:22px">
+                    <div class="section-title"><i class="fa-solid fa-graduation-cap"></i> Examination Manager</div>
+                    <form class="exam-form" id="examForm">
+                        <input type="text" id="examName" placeholder="Exam name (e.g. Physics)" required>
+                        <select id="examType">
+                            <option>Pre-Midterm</option>
+                            <option>Midterm</option>
+                            <option>Post-Midterm</option>
+                            <option>Annual Examination</option>
+                        </select>
+                        <input type="date" id="examDate" required>
+                        <input type="time" id="examTime" value="09:00">
+                        <button class="btn primary"><i class="fa-solid fa-plus"></i></button>
+                    </form>
+                    <div id="examList"></div>
+                </div>
+            </div>
+        </section>
+
+        <footer style="text-align:center;color:var(--muted);font-size:.8rem;padding:30px 0">
+           Class 11 Dashboard · <span id="footerYear"></span>
+        </footer>
+    </main>
+
+    <!-- modal -->
+    <div class="modal-back" id="modalBack">
+        <div class="modal glass">
+            <h3 id="modalTitle">Confirm</h3>
+            <p id="modalMsg">Are you sure?</p>
+            <div class="row">
+                <button class="btn" id="modalCancel">Cancel</button>
+                <button class="btn danger" id="modalOk">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-wrap" id="toastWrap"></div>
+    <canvas id="confetti"></canvas>
+
+    <script>
+        /* ==============================================================
+           CLASS11 Personal Dashboard — single-file app
+           ============================================================== */
+
+        /* ---------- SAMPLE DATA (JSON) ---------- */
+        const SUBJECT_META = [
+            { key: "physics", name: "Physics", icon: "fa-atom", page: "physics.html" },
+            { key: "maths", name: "Mathematics", icon: "fa-square-root-variable", page: "maths.html" },
+            { key: "chemistry", name: "Chemistry", icon: "fa-flask", page: "chemistry.html" },
+            { key: "cs", name: "Computer Science", icon: "fa-code", page: "cs.html" },
+            { key: "english", name: "English", icon: "fa-feather", page: "english.html" },
+        ];
+
+    const DEFAULT_CHAPTERS = {
+        chemistry: [
+            "Chapter 1: Some Basic Concepts of Chemistry",
+            "Chapter 2: Structure of Atom",
+            "Chapter 3: Classification of Elements and Periodicity in Properties",
+            "Chapter 4: Chemical Bonding and Molecular Structure",
+            "Chapter 5: Thermodynamics",
+            "Chapter 6: Equilibrium",
+            "Chapter 7: Redox Reactions",
+            "Chapter 8: Organic Chemistry – Some Basic Principles and Techniques",
+            "Chapter 9: Hydrocarbons"
+        ],
+
+        physics: [
+            "Chapter 1: Units and Measurements",
+            "Chapter 2: Motion in a Straight Line",
+            "Chapter 3: Motion in a Plane",
+            "Chapter 4: Laws of Motion",
+            "Chapter 5: Work, Energy, and Power",
+            "Chapter 6: System of Particles and Rotational Motion",
+            "Chapter 7: Gravitation",
+            "Chapter 8: Mechanical Properties of Solids",
+            "Chapter 9: Mechanical Properties of Fluids",
+            "Chapter 10: Thermal Properties of Matter",
+            "Chapter 11: Thermodynamics",
+            "Chapter 12: Kinetic Theory",
+            "Chapter 13: Oscillations",
+            "Chapter 14: Waves"
+        ],
+
+        maths: [
+            "Chapter 1: Sets",
+            "Chapter 2: Relations and Functions",
+            "Chapter 3: Trigonometric Functions",
+            "Chapter 4: Complex Numbers and Quadratic Equations",
+            "Chapter 5: Linear Inequalities",
+            "Chapter 6: Permutations and Combinations",
+            "Chapter 7: Binomial Theorem",
+            "Chapter 8: Sequences and Series",
+            "Chapter 9: Straight Lines",
+            "Chapter 10: Conic Sections",
+            "Chapter 11: Introduction to Three Dimensional Geometry",
+            "Chapter 12: Limits and Derivatives",
+            "Chapter 13: Statistics",
+            "Chapter 14: Probability"
+        ],
+
+        cs: [
+            "Chapter 1: Computer System",
+            "Chapter 2: Encoding Schemes and Number System",
+            "Chapter 3: Emerging Trends",
+            "Chapter 4: Introduction to Problem Solving",
+            "Chapter 5: Getting Started with Python",
+            "Chapter 6: Flow of Control",
+            "Chapter 7: Functions",
+            "Chapter 8: Strings",
+            "Chapter 9: Lists",
+            "Chapter 10: Tuples and Dictionaries",
+            "Chapter 11: Societal Impact"
+        ],
+
+        english: [
+            "The Portrait of a Lady",
+            "We're Not Afraid to Die... if We Can All Be Together",
+            "Discovering Tut: The Saga Continues",
+            "The Ailing Planet: The Green Movement's Role",
+            "The Adventure",
+            "Silk Road",
+            "A Photograph",
+            "The Laburnum Top",
+            "Voice of the Rain",
+            "Childhood",
+            "Father to Son",
+            "The Summer of the Beautiful White Horse",
+            "The Address",
+            "Ranga's Marriage",
+            "Albert Einstein at School",
+            "Mother's Day",
+            "The Ghat of the Only World",
+            "Birth"
+        ]
+    };
+
+        const QUOTES = [
+            { q: "The expert in anything was once a beginner.", a: "Helen Hayes" },
+
+        ];
+
+        const FALLBACK_NEWS = [
+            { title: "ISRO announces next-gen lunar mission roadmap for the decade", source: "Science Today", date: "Today" },
+            { title: "CBSE introduces AI-assisted assessment in Class 11 pilot schools", source: "Education Daily", date: "Today" },
+            { title: "India crosses milestone in renewable energy capacity", source: "Energy Watch", date: "Yesterday" },
+            { title: "New discovery in quantum computing accelerates research", source: "Tech Frontier", date: "Yesterday" },
+            { title: "Global climate summit ends with new emission targets", source: "World Affairs", date: "2 days ago" },
+        ];
+
+        /* ---------- STORAGE ---------- */
+        const LS = {
+            get: (k, fb) => { try { return JSON.parse(localStorage.getItem(k)) ?? fb } catch { return fb } },
+            set: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
+        };
+
+        /* ---------- STATE ---------- */
+        let state = {
+            chapters: LS.get("c11.chapters", null) || defaultChapterState(),
+            todos: LS.get("c11.todos", []),
+            exams: LS.get("c11.exams", []),
+            notes: LS.get("c11.notes", ""),
+            collapsed: LS.get("c11.collapsed", {}),
+            streak: LS.get("c11.streak", { cur: 0, best: 0, last: null, goal: "2h" }),
+        };
+
+        function defaultChapterState() {
+            const o = {};
+            SUBJECT_META.forEach(s => {
+                o[s.key] = DEFAULT_CHAPTERS[s.key].map(name => blankChapter(name));
+            });
+            return o;
+        }
+        function blankChapter(name) {
+            return { id: crypto.randomUUID(), name, taught: false, learned: false, notes: false, pyq: false, t1: "", t2: "", t3: "" };
+        }
+        function persist() {
+            LS.set("c11.chapters", state.chapters);
+            LS.set("c11.todos", state.todos);
+            LS.set("c11.exams", state.exams);
+            LS.set("c11.notes", state.notes);
+            LS.set("c11.collapsed", state.collapsed);
+            LS.set("c11.streak", state.streak);
+        }
+
+        /* ---------- UTIL ---------- */
+        const $ = s => document.querySelector(s);
+        const $$ = s => document.querySelectorAll(s);
+        const fmtNum = n => Number.isFinite(n) ? n.toFixed(n % 1 ? 1 : 0) : "—";
+
+        function toast(msg, type = "info", icon = "fa-circle-info") {
+            const el = document.createElement("div");
+            el.className = "toast " + type;
+            el.innerHTML = `<i class="fa-solid ${icon}"></i><span>${msg}</span>`;
+            $("#toastWrap").appendChild(el);
+            setTimeout(() => { el.style.opacity = 0; el.style.transform = "translateX(120%)"; el.style.transition = ".4s"; setTimeout(() => el.remove(), 400) }, 3000);
+        }
+
+        function confirmModal(title, msg) {
+            return new Promise(res => {
+                $("#modalTitle").textContent = title;
+                $("#modalMsg").textContent = msg;
+                $("#modalBack").classList.add("open");
+                const ok = () => { cleanup(); res(true) };
+                const no = () => { cleanup(); res(false) };
+                function cleanup() {
+                    $("#modalBack").classList.remove("open");
+                    $("#modalOk").removeEventListener("click", ok);
+                    $("#modalCancel").removeEventListener("click", no);
+                }
+                $("#modalOk").addEventListener("click", ok);
+                $("#modalCancel").addEventListener("click", no);
+            });
+        }
+
+        /* ---------- COMPUTATIONS ---------- */
+        function chapterAvg(c) {
+            const arr = [c.t1, c.t2, c.t3].map(x => parseFloat(x)).filter(n => !isNaN(n));
+            if (!arr.length) return null;
+            return arr.reduce((a, b) => a + b, 0) / arr.length;
+        }
+        function subjectStats(key) {
+            const list = state.chapters[key] || [];
+            const total = list.length;
+            const learned = list.filter(c => c.learned).length;
+            const taught = list.filter(c => c.taught).length;
+            const notes = list.filter(c => c.notes).length;
+            const pyq = list.filter(c => c.pyq).length;
+            const avgs = list.map(chapterAvg).filter(x => x != null);
+            const avg = avgs.length ? avgs.reduce((a, b) => a + b, 0) / avgs.length : null;
+            const pct = total ? Math.round(learned / total * 100) : 0;
+            return { total, learned, taught, notes, pyq, avg, pct };
+        }
+        function overallStats() {
+            let total = 0, learned = 0, taught = 0, notes = 0, pyq = 0, avgSum = 0, avgN = 0;
+            let best = { k: null, pct: -1 }, weak = { k: null, pct: 101 };
+            SUBJECT_META.forEach(s => {
+                const st = subjectStats(s.key);
+                total += st.total; learned += st.learned; taught += st.taught; notes += st.notes; pyq += st.pyq;
+                if (st.avg != null) { avgSum += st.avg; avgN++; }
+                if (st.total > 0) {
+                    if (st.pct > best.pct) { best = { k: s.key, pct: st.pct, name: s.name } }
+                    if (st.pct < weak.pct) { weak = { k: s.key, pct: st.pct, name: s.name } }
+                }
+            });
+            return {
+                total, learned, taught, notes, pyq,
+                avg: avgN ? avgSum / avgN : null,
+                pct: total ? Math.round(learned / total * 100) : 0,
+                best: best.k ? best.name : "—",
+                weak: weak.k ? weak.name : "—"
+            };
+        }
+
+        /* ---------- RENDER: SUBJECT NAV ---------- */
+        function renderSubjectNav() {
+            const nav = $("#subjectsNav"); nav.innerHTML = "";
+            SUBJECT_META.forEach((s, i) => {
+                const st = subjectStats(s.key);
+                const a = document.createElement("a");
+                a.href = s.page; a.className = "subject-card"; a.dataset.subject = s.key;
+                a.style.animationDelay = (i * 60) + "ms";
+                a.innerHTML = `
+      <div class="sc-head">
+        <div class="ic"><i class="fa-solid ${s.icon}"></i></div>
+        <i class="fa-solid fa-arrow-right" style="opacity:.5"></i>
+      </div>
+      <h3>${s.name}</h3>
+      <div class="meta">${st.total} chapters · ${st.learned} done</div>
+      <div class="sc-progress">
+        <div class="sc-bar"><span style="width:0%"></span></div>
+        <div class="sc-row"><span>Progress</span><b>${st.pct}%</b></div>
+      </div>`;
+                nav.appendChild(a);
+                requestAnimationFrame(() => { a.querySelector(".sc-bar span").style.width = st.pct + "%" });
+            });
+        }
+
+        /* ---------- RENDER: STATS ---------- */
+        function renderStats() {
+            const o = overallStats();
+            const cards = [
+                { ic: "fa-layer-group", n: o.total, l: "Total Chapters" },
+                { ic: "fa-circle-check", n: o.learned, l: "Chapters Learned" },
+                { ic: "fa-hourglass-half", n: o.total - o.learned, l: "Chapters Left" },
+                { ic: "fa-chalkboard-user", n: o.taught, l: "Teacher Taught" },
+                { ic: "fa-pen-clip", n: o.notes, l: "Notes Completed" },
+                { ic: "fa-clipboard-question", n: o.pyq, l: "PYQs Completed" },
+                { ic: "fa-percent", n: o.pct + "%", l: "Completion" },
+                { ic: "fa-star", n: o.avg == null ? "—" : fmtNum(o.avg), l: "Average Marks" },
+            ];
+            const grid = $("#statsGrid"); grid.innerHTML = "";
+            cards.forEach((c, i) => {
+                const el = document.createElement("div"); el.className = "stat"; el.style.animationDelay = (i * 40) + "ms";
+                el.innerHTML = `<div class="ic"><i class="fa-solid ${c.ic}"></i></div>
+      <div><div class="num" data-num="${typeof c.n === 'number' ? c.n : ''}">${c.n}</div><div class="lbl">${c.l}</div></div>`;
+                grid.appendChild(el);
+            });
+            animateCounters();
+
+            // overall
+            $("#ovDone").textContent = o.learned;
+            $("#ovTotal").textContent = o.total;
+            $("#ovPct").textContent = o.pct + "%";
+            $("#msAvg").textContent = o.avg == null ? "—" : fmtNum(o.avg);
+            $("#msBest").textContent = o.best;
+            $("#msWeak").textContent = o.weak;
+
+            // ring
+            const C = 2 * Math.PI * 100;
+            const ring = $("#ringFg");
+            ring.setAttribute("stroke-dasharray", C);
+            ring.setAttribute("stroke-dashoffset", C - (o.pct / 100) * C);
+            $("#ringPct").textContent = o.pct + "%";
+        }
+        function animateCounters() {
+            $$(".stat .num").forEach(el => {
+                const target = parseFloat(el.dataset.num);
+                if (isNaN(target)) return;
+                let cur = 0; const step = Math.max(1, target / 40);
+                const t = setInterval(() => {
+                    cur += step;
+                    if (cur >= target) { cur = target; clearInterval(t) }
+                    el.textContent = Math.round(cur);
+                }, 18);
+            });
+        }
+
+        /* ---------- RENDER: TRACKERS ---------- */
+        function renderTrackers() {
+            const list = $("#trackersList"); list.innerHTML = "";
+            const sorted = [...SUBJECT_META].sort((a, b) => subjectStats(b.key).pct - subjectStats(a.key).pct);
+            sorted.forEach(s => {
+                const st = subjectStats(s.key);
+                const tracker = document.createElement("div");
+                tracker.className = "subject-tracker" + (state.collapsed[s.key] ? " collapsed" : "");
+                tracker.dataset.subject = s.key;
+                tracker.style.setProperty("--card-grad", `var(--card-grad-${s.key})`);
+                tracker.innerHTML = `
+      <div class="tracker-head">
+        <div class="ic" style="background:${gradFor(s.key)}"><i class="fa-solid ${s.icon}"></i></div>
+        <h3>${s.name}</h3>
+        <div class="progress-tag">
+          <div class="bar"><span style="width:${st.pct}%;background:${gradFor(s.key)}"></span></div>
+          <b>${st.pct}%</b>
+        </div>
+        <div class="tracker-actions">
+          <button class="btn sm" onclick="toggleCollapse('${s.key}')"><i class="fa-solid fa-chevron-${state.collapsed[s.key] ? 'down' : 'up'}"></i></button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="tracker">
+          <thead><tr>
+            <th>Chapter</th><th>Taught</th><th>Learned</th><th>Notes</th><th>PYQs</th>
+            <th>UT 1</th><th>UT 2</th><th>UT 3</th><th>Avg</th><th></th>
+          </tr></thead>
+          <tbody>
+            ${st.total === 0 ? `<tr><td colspan="10" style="color:var(--muted);padding:18px">No chapters yet — add one below.</td></tr>` :
+                        state.chapters[s.key].map(c => chapterRow(s.key, c)).join("")}
+          </tbody>
+        </table>
+      </div>
+      <div class="add-chapter">
+        <input type="text" placeholder="New chapter name…" id="add-${s.key}">
+        <button class="btn primary" onclick="addChapter('${s.key}')"><i class="fa-solid fa-plus"></i> Add</button>
+      </div>`;
+                list.appendChild(tracker);
+            });
+        }
+        function gradFor(k) {
+            return ({
+                physics: "linear-gradient(135deg,#7c5cff,#22d3ee)",
+                maths: "linear-gradient(135deg,#ff5cf2,#7c5cff)",
+                chemistry: "linear-gradient(135deg,#3ddc97,#22d3ee)",
+                cs: "linear-gradient(135deg,#ffb547,#ff5d6c)",
+                english: "linear-gradient(135deg,#22d3ee,#3ddc97)",
+            })[k];
+        }
+        function chapterRow(sk, c) {
+            const avg = chapterAvg(c);
+            return `<tr data-id="${c.id}">
+    <td>${escapeHtml(c.name)}</td>
+    <td><span class="checkbox ${c.taught ? 'on' : ''}" onclick="toggleField('${sk}','${c.id}','taught')"><i class="fa-solid fa-check"></i></span></td>
+    <td><span class="checkbox ${c.learned ? 'on' : ''}" onclick="toggleField('${sk}','${c.id}','learned')"><i class="fa-solid fa-check"></i></span></td>
+    <td><span class="checkbox ${c.notes ? 'on' : ''}" onclick="toggleField('${sk}','${c.id}','notes')"><i class="fa-solid fa-check"></i></span></td>
+    <td><span class="checkbox ${c.pyq ? 'on' : ''}" onclick="toggleField('${sk}','${c.id}','pyq')"><i class="fa-solid fa-check"></i></span></td>
+    <td><input class="mark-input" type="number" min="0" max="100" value="${c.t1}" oninput="setMark('${sk}','${c.id}','t1',this.value)"></td>
+    <td><input class="mark-input" type="number" min="0" max="100" value="${c.t2}" oninput="setMark('${sk}','${c.id}','t2',this.value)"></td>
+    <td><input class="mark-input" type="number" min="0" max="100" value="${c.t3}" oninput="setMark('${sk}','${c.id}','t3',this.value)"></td>
+    <td><b>${avg == null ? "—" : fmtNum(avg)}</b></td>
+    <td><button class="btn sm danger" onclick="deleteChapter('${sk}','${c.id}')"><i class="fa-solid fa-trash"></i></button></td>
+  </tr>`;
+        }
+        function escapeHtml(s) { return String(s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])) }
+
+        window.toggleField = (sk, id, f) => {
+            const c = state.chapters[sk].find(x => x.id === id); if (!c) return;
+            c[f] = !c[f];
+            persist(); renderAll();
+            if (f === "learned" && subjectStats(sk).pct === 100) { confetti(); toast(`${SUBJECT_META.find(s => s.key === sk).name} 100% completed! 🎉`, "success", "fa-trophy") }
+        };
+        window.setMark = (sk, id, f, v) => {
+            const c = state.chapters[sk].find(x => x.id === id); if (!c) return;
+            c[f] = v; persist();
+            // update avg cell + stats lightly
+            const row = document.querySelector(`tr[data-id="${id}"]`);
+            if (row) { const avg = chapterAvg(c); row.children[8].innerHTML = `<b>${avg == null ? "—" : fmtNum(avg)}</b>` }
+            renderStats(); renderSubjectNav();
+        };
+        window.deleteChapter = async (sk, id) => {
+            const ok = await confirmModal("Delete chapter?", "This will permanently remove the chapter and its marks.");
+            if (!ok) return;
+            state.chapters[sk] = state.chapters[sk].filter(c => c.id !== id);
+            persist(); renderAll(); toast("Chapter deleted", "info", "fa-trash");
+        };
+        window.addChapter = (sk) => {
+            const inp = $("#add-" + sk); const name = inp.value.trim();
+            if (!name) return toast("Enter a chapter name", "error", "fa-circle-exclamation");
+            state.chapters[sk].push(blankChapter(name));
+            inp.value = ""; persist(); renderAll(); toast("Chapter added", "success", "fa-circle-check");
+        };
+        window.toggleCollapse = (sk) => { state.collapsed[sk] = !state.collapsed[sk]; persist(); renderTrackers() };
+
+        /* ---------- TO-DO ---------- */
+        $("#todoForm").addEventListener("submit", e => {
+            e.preventDefault();
+            const t = $("#todoText").value.trim(); if (!t) return;
+            state.todos.push({ id: crypto.randomUUID(), text: t, pri: $("#todoPri").value, due: $("#todoDate").value || null, done: false, created: Date.now() });
+            $("#todoText").value = ""; $("#todoDate").value = "";
+            persist(); renderTodos(); toast("Task added", "success", "fa-circle-check");
+        });
+        function renderTodos() {
+            const today = new Date().toISOString().slice(0, 10);
+            const lists = { today: [], upcoming: [], done: [] };
+            state.todos.forEach(t => {
+                if (t.done) lists.done.push(t);
+                else if (!t.due || t.due === today) lists.today.push(t);
+                else if (t.due > today) lists.upcoming.push(t);
+                else lists.today.push(t);
+            });
+            const priOrder = { high: 0, medium: 1, low: 2 };
+            ["today", "upcoming", "done"].forEach(k => {
+                lists[k].sort((a, b) => priOrder[a.pri] - priOrder[b.pri] || (a.due || "").localeCompare(b.due || ""));
+            });
+            const render = arr => arr.map(t => `
+    <div class="todo-item ${t.done ? 'done' : ''}">
+      <span class="checkbox ${t.done ? 'on' : ''}" onclick="toggleTodo('${t.id}')"><i class="fa-solid fa-check"></i></span>
+      <div style="flex:1">
+        <div class="title">${escapeHtml(t.text)}</div>
+        ${t.due ? `<div class="due"><i class="fa-regular fa-calendar"></i> ${t.due}</div>` : ''}
+      </div>
+      <span class="pri ${t.pri}">${t.pri}</span>
+      <button class="btn sm" onclick="deleteTodo('${t.id}')"><i class="fa-solid fa-xmark"></i></button>
+    </div>`).join("") || `<div style="color:var(--muted);font-size:.82rem;padding:6px">Nothing here.</div>`;
+            $("#todoToday").innerHTML = render(lists.today);
+            $("#todoUpcoming").innerHTML = render(lists.upcoming);
+            $("#todoDone").innerHTML = render(lists.done);
+        }
+        window.toggleTodo = id => { const t = state.todos.find(x => x.id === id); if (!t) return; t.done = !t.done; persist(); renderTodos() };
+        window.deleteTodo = async id => {
+            const ok = await confirmModal("Delete task?", "This will remove the task permanently.");
+            if (!ok) return; state.todos = state.todos.filter(t => t.id !== id); persist(); renderTodos(); toast("Task deleted", "info", "fa-trash");
+        };
+
+        /* ---------- EXAMS ---------- */
+        $("#examForm").addEventListener("submit", e => {
+            e.preventDefault();
+            const exam = {
+                id: crypto.randomUUID(),
+                name: $("#examName").value.trim(),
+                type: $("#examType").value,
+                date: $("#examDate").value,
+                time: $("#examTime").value || "09:00",
+                portions: {},
+            };
+            if (!exam.name || !exam.date) return;
+            state.exams.push(exam);
+            $("#examName").value = ""; $("#examDate").value = "";
+            persist(); renderExams(); toast("Exam added", "success", "fa-calendar-plus");
+        });
+        function renderExams() {
+            const list = $("#examList"); list.innerHTML = "";
+            const sorted = [...state.exams].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+            const now = Date.now();
+            const upcoming = sorted.filter(e => new Date(e.date + "T" + e.time).getTime() > now);
+            const nextId = upcoming[0]?.id;
+            if (!sorted.length) { list.innerHTML = `<div style="color:var(--muted);font-size:.85rem;padding:8px">No exams scheduled yet.</div>`; return }
+            sorted.forEach(ex => {
+                const dt = new Date(ex.date + "T" + ex.time);
+                const card = document.createElement("div");
+                card.className = "exam-card" + (ex.id === nextId ? " next" : "");
+                card.dataset.dt = dt.getTime();
+                card.innerHTML = `
+      <div class="top">
+        <div>
+          <div class="type-tag">${ex.type}${ex.id === nextId ? ' · Next up' : ''}</div>
+          <h4>${escapeHtml(ex.name)}</h4>
+          <div style="font-size:.78rem;color:var(--muted);margin-top:2px"><i class="fa-regular fa-calendar"></i> ${ex.date} at ${ex.time}</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn sm" onclick="togglePortionPicker('${ex.id}')"><i class="fa-solid fa-list"></i> Portions</button>
+          <button class="btn sm danger" onclick="deleteExam('${ex.id}')"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+      <div class="countdown" data-cd="${ex.id}"></div>
+      <div class="portion-picker" id="pp-${ex.id}">${portionPickerHtml(ex)}</div>
+      <div class="portion-section">${portionSummary(ex)}</div>`;
+                list.appendChild(card);
+            });
+            updateCountdowns();
+        }
+        function portionPickerHtml(ex) {
+            return SUBJECT_META.map(s => {
+                const chs = state.chapters[s.key] || []; if (!chs.length) return "";
+                const picked = ex.portions[s.key] || [];
+                return `<div class="grp"><h5>${s.name}</h5>${chs.map(c => `<label><input type="checkbox" ${picked.includes(c.id) ? "checked" : ""} onchange="togglePortion('${ex.id}','${s.key}','${c.id}',this.checked)"> ${escapeHtml(c.name)}</label>`).join("")
+                    }</div>`;
+            }).join("");
+        }
+        function portionSummary(ex) {
+            const parts = SUBJECT_META.map(s => {
+                const ids = ex.portions[s.key] || []; if (!ids.length) return null;
+                const names = ids.map(id => state.chapters[s.key].find(c => c.id === id)?.name).filter(Boolean);
+                return `<div class="grp"><b>${s.name}:</b> ${names.map(n => `<span class="portion-chip">${escapeHtml(n)}</span>`).join("")}</div>`;
+            }).filter(Boolean);
+            return parts.length ? parts.join("") : `<div style="color:var(--muted);font-size:.78rem;margin-top:6px"><i class="fa-solid fa-circle-info"></i> No portions selected yet.</div>`;
+        }
+        window.togglePortionPicker = id => $("#pp-" + id).classList.toggle("open");
+        window.togglePortion = (eid, sk, cid, on) => {
+            const ex = state.exams.find(e => e.id === eid); if (!ex) return;
+            ex.portions[sk] = ex.portions[sk] || [];
+            if (on) ex.portions[sk].push(cid); else ex.portions[sk] = ex.portions[sk].filter(x => x !== cid);
+            persist(); renderExams(); $("#pp-" + eid).classList.add("open");
+        };
+        window.deleteExam = async id => {
+            const ok = await confirmModal("Delete exam?", "This exam and its portions will be removed.");
+            if (!ok) return; state.exams = state.exams.filter(e => e.id !== id); persist(); renderExams(); toast("Exam deleted", "info", "fa-trash");
+        };
+        function updateCountdowns() {
+            $$("[data-cd]").forEach(box => {
+                const card = box.closest(".exam-card"); if (!card) return;
+                const dt = parseInt(card.dataset.dt, 10);
+                let diff = dt - Date.now();
+                if (diff <= 0) { box.innerHTML = `<div style="color:var(--muted);font-size:.8rem">This exam has started/ended.</div>`; return }
+                const d = Math.floor(diff / 86400000); diff %= 86400000;
+                const h = Math.floor(diff / 3600000); diff %= 3600000;
+                const m = Math.floor(diff / 60000); diff %= 60000;
+                const s = Math.floor(diff / 1000);
+                box.innerHTML = `
+      <div class="cd-box"><b>${d}</b><span>Days</span></div>
+      <div class="cd-box"><b>${h}</b><span>Hrs</span></div>
+      <div class="cd-box"><b>${m}</b><span>Min</span></div>
+      <div class="cd-box"><b>${s}</b><span>Sec</span></div>`;
+            });
+        }
+        setInterval(updateCountdowns, 1000);
+
+        /* ---------- QUOTE ---------- */
+        function refreshQuote() {
+            const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+            const box = $("#quoteBox");
+            box.style.opacity = 0; box.style.transition = ".3s";
+            setTimeout(() => {
+                box.innerHTML = `${escapeHtml(q.q)}<div class="quote-author">— ${escapeHtml(q.a)}</div>`;
+                box.style.opacity = 1;
+            }, 250);
+        }
+        window.refreshQuote = refreshQuote;
+
+        /* ---------- NEWS (free, no API key — Hacker News Algolia) ---------- */
+        async function loadNews() {
+            const list = $("#newsList");
+            list.innerHTML = `<div style="color:var(--muted);font-size:.82rem">Loading headlines…</div>`;
+            try {
+                const r = await fetch("https://hn.algolia.com/api/v1/search?tags=front_page");
+                if (!r.ok) throw new Error("net");
+                const d = await r.json();
+                const items = (d.hits || []).slice(0, 5).map(h => ({ title: h.title || h.story_title, source: "Hacker News", date: new Date(h.created_at).toLocaleDateString(), url: h.url || `https://news.ycombinator.com/item?id=${h.objectID}` }));
+                if (!items.length) throw new Error("empty");
+                list.innerHTML = items.map(i => `<div class="news-item"><a href="${i.url}" target="_blank" rel="noopener">${escapeHtml(i.title)}</a><div class="meta">${i.source} · ${i.date}</div></div>`).join("");
+            } catch {
+                list.innerHTML = FALLBACK_NEWS.map(i => `<div class="news-item"><a href="#" onclick="return false">${escapeHtml(i.title)}</a><div class="meta">${i.source} · ${i.date}</div></div>`).join("");
+            }
+        }
+        window.loadNews = loadNews;
+
+        /* ---------- WEATHER (Open-Meteo, no key) ---------- */
+        async function loadWeather() {
+            const lat = 11.2588, lon = 75.7804; // Kozhikode, Kerala
+            try {
+                const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation_probability,weather_code,wind_speed_10m&timezone=auto`);
+                const d = await r.json(); const c = d.current;
+                $("#weatherTemp").textContent = Math.round(c.temperature_2m) + "°C";
+                $("#weatherCond").textContent = wcode(c.weather_code);
+                $("#weatherHum").textContent = c.relative_humidity_2m + "%";
+                $("#weatherFeel").textContent = Math.round(c.apparent_temperature) + "°C";
+                $("#weatherRain").textContent = (c.precipitation_probability ?? 0) + "%";
+                $("#weatherWind").textContent = Math.round(c.wind_speed_10m) + " km/h";
+                $("#weatherIcon").className = "fa-solid " + wicon(c.weather_code);
+            } catch {
+                $("#weatherTemp").textContent = "29°C"; $("#weatherCond").textContent = "Partly cloudy";
+                $("#weatherHum").textContent = "78%"; $("#weatherFeel").textContent = "33°C"; $("#weatherRain").textContent = "40%"; $("#weatherWind").textContent = "12 km/h";
+            }
+        }
+        function wcode(c) {
+            if (c === 0) return "Clear sky"; if ([1, 2].includes(c)) return "Partly cloudy"; if (c === 3) return "Overcast";
+            if ([45, 48].includes(c)) return "Fog"; if ([51, 53, 55].includes(c)) return "Drizzle";
+            if ([61, 63, 65, 80, 81, 82].includes(c)) return "Rain"; if ([71, 73, 75, 77, 85, 86].includes(c)) return "Snow";
+            if ([95, 96, 99].includes(c)) return "Thunderstorm"; return "Pleasant";
+        }
+        function wicon(c) {
+            if (c === 0) return "fa-sun"; if ([1, 2].includes(c)) return "fa-cloud-sun"; if (c === 3) return "fa-cloud";
+            if ([45, 48].includes(c)) return "fa-smog"; if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(c)) return "fa-cloud-rain";
+            if ([71, 73, 75, 77, 85, 86].includes(c)) return "fa-snowflake"; if ([95, 96, 99].includes(c)) return "fa-cloud-bolt";
+            return "fa-cloud-sun";
+        }
+
+        /* ---------- POMODORO ---------- */
+        let pomo = { t: 25 * 60, run: false, mode: "focus", int: null };
+        function pomoTick() {
+            pomo.t--;
+            if (pomo.t < 0) {
+                pomo.mode = pomo.mode === "focus" ? "break" : "focus";
+                pomo.t = (pomo.mode === "focus" ? 25 : 5) * 60;
+                toast(pomo.mode === "focus" ? "Break over — back to focus!" : "Focus done — take a break.", "success", "fa-bell");
+            }
+            paintPomo();
+        }
+        function paintPomo() {
+            const m = String(Math.floor(pomo.t / 60)).padStart(2, "0");
+            const s = String(pomo.t % 60).padStart(2, "0");
+            $("#pomoTime").textContent = `${m}:${s}`;
+            $("#pomoMode").textContent = (pomo.mode === "focus" ? "Focus" : "Break") + " · 25/5";
+        }
+        $("#pomoStart").addEventListener("click", () => {
+            pomo.run = !pomo.run;
+            $("#pomoStart").innerHTML = pomo.run ? '<i class="fa-solid fa-pause"></i> Pause' : '<i class="fa-solid fa-play"></i> Start';
+            if (pomo.run) { pomo.int = setInterval(pomoTick, 1000) } else clearInterval(pomo.int);
+        });
+        $("#pomoReset").addEventListener("click", () => {
+            clearInterval(pomo.int); pomo.run = false; pomo.mode = "focus"; pomo.t = 25 * 60;
+            $("#pomoStart").innerHTML = '<i class="fa-solid fa-play"></i> Start'; paintPomo();
+        });
+
+        /* ---------- NOTES ---------- */
+        $("#stickyNotes").value = state.notes;
+        $("#stickyNotes").addEventListener("input", e => { state.notes = e.target.value; persist() });
+
+        /* ---------- STREAK ---------- */
+        function paintStreak() {
+            $("#streakCur").textContent = state.streak.cur;
+            $("#streakBest").textContent = state.streak.best;
+            $("#streakGoal").textContent = state.streak.goal;
+            $("#heroStreak").textContent = state.streak.cur;
+            $("#heroGoal").textContent = state.streak.goal;
+        }
+        function logStudyDay() {
+            const today = new Date().toISOString().slice(0, 10);
+            if (state.streak.last === today) { toast("Already logged today ✨", "info", "fa-star"); return }
+            const yest = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+            state.streak.cur = state.streak.last === yest ? state.streak.cur + 1 : 1;
+            state.streak.best = Math.max(state.streak.best, state.streak.cur);
+            state.streak.last = today; persist(); paintStreak();
+            toast(`Streak: ${state.streak.cur} days 🔥`, "success", "fa-fire");
+        }
+        window.logStudyDay = logStudyDay;
+
+        /* ---------- FOCUS + REVISION ---------- */
+        function renderFocus() {
+            const ul = $("#focusList");
+            const items = [];
+            SUBJECT_META.forEach(s => {
+                const list = state.chapters[s.key];
+                const next = list.find(c => !c.learned);
+                if (next) items.push(`${s.name}: ${next.name}`);
+            });
+            ul.innerHTML = (items.slice(0, 5).map(t => `<li><i class="fa-solid fa-circle-dot"></i> ${escapeHtml(t)}</li>`).join("")) || `<li><i class="fa-solid fa-trophy"></i> All caught up! 🎉</li>`;
+
+            const rev = $("#revisionList");
+            const revItems = [];
+            SUBJECT_META.forEach(s => {
+                const st = subjectStats(s.key);
+                if (st.total && st.pct < 60) revItems.push(`${s.name} needs revision (${st.pct}%)`);
+            });
+            const totalLeft = overallStats().total - overallStats().learned;
+            const estDays = totalLeft ? Math.ceil(totalLeft / 1.5) : 0;
+            revItems.push(`Estimated ${estDays} days to finish all chapters at 1.5/day`);
+            rev.innerHTML = revItems.map(t => `<li><i class="fa-solid fa-arrow-right-rotate"></i> ${escapeHtml(t)}</li>`).join("");
+        }
+
+        /* ---------- CONFETTI ---------- */
+        function confetti() {
+            const c = $("#confetti"); const ctx = c.getContext("2d");
+            c.width = innerWidth; c.height = innerHeight;
+            const parts = Array.from({ length: 150 }, () => ({
+                x: Math.random() * c.width, y: -20, r: Math.random() * 6 + 3,
+                c: `hsl(${Math.random() * 360},90%,60%)`,
+                vy: Math.random() * 4 + 3, vx: Math.random() * 4 - 2, a: Math.random() * Math.PI * 2,
+            }));
+            let f = 0;
+            (function loop() {
+                f++; ctx.clearRect(0, 0, c.width, c.height);
+                parts.forEach(p => { p.x += p.vx; p.y += p.vy; p.a += .1; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a); ctx.fillStyle = p.c; ctx.fillRect(-p.r / 2, -p.r / 2, p.r, p.r); ctx.restore() });
+                if (f < 140) requestAnimationFrame(loop); else ctx.clearRect(0, 0, c.width, c.height);
+            })();
+        }
+
+        /* ---------- THEME / CLOCK / SCROLL ---------- */
+        $("#themeToggle").addEventListener("click", () => {
+            const cur = document.documentElement.dataset.theme;
+            const next = cur === "dark" ? "light" : "dark";
+            document.documentElement.dataset.theme = next;
+            LS.set("c11.theme", next);
+            $("#themeToggle").innerHTML = next === "dark" ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
+        });
+        const savedTheme = LS.get("c11.theme", "dark");
+        document.documentElement.dataset.theme = savedTheme;
+        $("#themeToggle").innerHTML = savedTheme === "dark" ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
+
+        function tickClock() {
+            const d = new Date();
+            $("#liveClock").textContent = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+            $("#heroDate").textContent = d.toLocaleDateString([], { weekday: "long", day: "numeric", month: "long" });
+        }
+        setInterval(tickClock, 1000); tickClock();
+
+        $("#scrollTopBtn").addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+        /* ---------- SCROLL REVEAL ---------- */
+        const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add("in") }), { threshold: .08 });
+        $$(".reveal").forEach(el => io.observe(el));
+
+        /* ---------- RENDER ALL ---------- */
+        function renderAll() {
+            renderSubjectNav(); renderStats(); renderTrackers(); renderTodos(); renderExams(); renderFocus(); paintStreak();
+        }
+        renderAll();
+        refreshQuote(); loadWeather(); loadNews();
+        $("#footerYear").textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>
