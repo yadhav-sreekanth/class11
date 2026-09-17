@@ -12,6 +12,12 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
         rel="stylesheet" />
+
+    <!-- Supabase JS client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <!-- Chart.js for exam analytics -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+
     <style>
         /* ============== RESET / BASE ============== */
         *,
@@ -272,6 +278,43 @@
             border-radius: 10px;
             background: var(--surface);
             border: 1px solid var(--border)
+        }
+
+        .sync-badge {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: .74rem;
+            color: var(--muted);
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            font-weight: 600;
+            cursor: default;
+        }
+
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .sync-dot.on {
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success)
+        }
+
+        .sync-dot.off {
+            background: var(--danger);
+            box-shadow: 0 0 8px var(--danger)
+        }
+
+        .sync-dot.pending {
+            background: var(--warn);
+            box-shadow: 0 0 8px var(--warn);
+            animation: pulse 1.4s ease-in-out infinite
         }
 
         /* ============== HERO ============== */
@@ -602,7 +645,7 @@
         .three-col {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 24px
+            gap: 20px
         }
 
         /* ============== SUBJECT TRACKERS ============== */
@@ -719,7 +762,7 @@
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
-            min-width: 880px;
+            min-width: 640px;
             font-size: .86rem
         }
 
@@ -765,22 +808,6 @@
             font-weight: 600
         }
 
-        .mark-input {
-            width: 64px;
-            padding: 7px 8px;
-            border-radius: 9px;
-            border: 1px solid var(--border);
-            background: var(--surface);
-            color: var(--text);
-            text-align: center;
-            font: 600 .82rem 'Space Grotesk'
-        }
-
-        .mark-input:focus {
-            outline: 2px solid var(--primary-2);
-            outline-offset: 1px
-        }
-
         .checkbox {
             width: 22px;
             height: 22px;
@@ -820,6 +847,10 @@
         /* collapsed */
         .subject-tracker.collapsed .table-wrap,
         .subject-tracker.collapsed .add-chapter {
+            display: none
+        }
+
+        .section-body.collapsed {
             display: none
         }
 
@@ -1282,6 +1313,199 @@
             color: var(--primary-2)
         }
 
+        /* ============== EXAM ANALYTICS SECTION ============== */
+        .tab-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px
+        }
+
+        .tab-pill {
+            padding: 9px 16px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--muted);
+            font: 600 .82rem 'Plus Jakarta Sans';
+            cursor: pointer;
+            transition: .25s;
+            display: flex;
+            align-items: center;
+            gap: 7px
+        }
+
+        .tab-pill:hover {
+            background: var(--surface-2);
+            color: var(--text)
+        }
+
+        .tab-pill.active {
+            background: var(--grad);
+            color: #fff;
+            border-color: transparent
+        }
+
+        .marks-card {
+            padding: 20px;
+            border-radius: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            margin-bottom: 20px
+        }
+
+        .marks-card h4 {
+            font-family: 'Space Grotesk';
+            font-size: 1.05rem;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .marks-card h4 .ic {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            color: #fff;
+            font-size: .9rem;
+            background: var(--card-grad, var(--grad))
+        }
+
+        .marks-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 9px
+        }
+
+        .marks-row label {
+            flex: 1;
+            font-size: .8rem;
+            color: var(--muted)
+        }
+
+        .marks-row .mi-wrap {
+            display: flex;
+            align-items: center;
+            gap: 4px
+        }
+
+        .marks-row input {
+            width: 58px;
+            padding: 7px 8px;
+            border-radius: 9px;
+            border: 1px solid var(--border);
+            background: var(--surface-2);
+            color: var(--text);
+            text-align: center;
+            font: 600 .8rem 'Space Grotesk'
+        }
+
+        .marks-row input:focus {
+            outline: 2px solid var(--primary-2);
+            outline-offset: 1px
+        }
+
+        .marks-row .slash {
+            color: var(--muted);
+            font-size: .78rem
+        }
+
+        .marks-card-avg {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: .82rem;
+            color: var(--muted)
+        }
+
+        .marks-card-avg b {
+            font-family: 'Space Grotesk';
+            color: var(--text);
+            font-size: 1.1rem
+        }
+
+        .trend-tag {
+            font-size: .66rem;
+            padding: 3px 9px;
+            border-radius: 999px;
+            font-weight: 700;
+            margin-left: auto;
+            text-transform: uppercase;
+            letter-spacing: .3px
+        }
+
+        .trend-tag.up {
+            background: rgba(61, 220, 151, .18);
+            color: #82edbe
+        }
+
+        .trend-tag.down {
+            background: rgba(255, 93, 108, .18);
+            color: #ff8a95
+        }
+
+        .trend-tag.flat {
+            background: rgba(255, 181, 71, .18);
+            color: #ffcc7d
+        }
+
+        .trend-tag.none {
+            background: var(--surface-2);
+            color: var(--muted)
+        }
+
+        .summary-line {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            padding: 13px 14px;
+            border-radius: 13px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            margin-bottom: 8px;
+            font-size: .87rem;
+            line-height: 1.5
+        }
+
+        .summary-line .ic {
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            font-size: .8rem;
+            color: #fff
+        }
+
+        .summary-line .ic.good {
+            background: linear-gradient(135deg, #3ddc97, #22d3ee)
+        }
+
+        .summary-line .ic.warn {
+            background: linear-gradient(135deg, #ffb547, #ff5d6c)
+        }
+
+        .summary-line .ic.info {
+            background: var(--grad)
+        }
+
+        .summary-line b {
+            color: var(--text)
+        }
+
+        .chart-wrap {
+            position: relative;
+            height: 300px
+        }
+
         /* ============== TOAST ============== */
         .toast-wrap {
             position: fixed;
@@ -1456,7 +1680,8 @@
                 padding: 16px
             }
 
-            .clock {
+            .clock,
+            .sync-badge {
                 display: none
             }
 
@@ -1503,6 +1728,10 @@
                 </div>
             </div>
             <div class="header-actions">
+                <div class="sync-badge" id="syncBadge" title="Supabase sync status">
+                    <span class="sync-dot off" id="syncDot"></span>
+                    <span id="syncLabel">Checking…</span>
+                </div>
                 <div class="clock" id="liveClock">--:--</div>
                 <button class="icon-btn" id="themeToggle" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
                 <button class="icon-btn" id="scrollTopBtn" title="Top"><i class="fa-solid fa-arrow-up"></i></button>
@@ -1516,7 +1745,7 @@
         <section class="hero reveal">
             <h2><span class="grad">Welcome back, Yadhav.</span><br />Let's make today count.</h2>
             <p class="sub">Track every chapter, master every test, and stay ahead of every deadline — your premium
-                command center for Class 11.</p>
+                command center for Class 11, synced to the cloud.</p>
             <div class="hero-meta">
                 <span class="chip"><i class="fa-solid fa-fire"></i> Streak <b id="heroStreak">0</b> days</span>
                 <span class="chip"><i class="fa-solid fa-bullseye"></i> Daily goal <b id="heroGoal">2h</b></span>
@@ -1560,7 +1789,7 @@
                     <div class="mini-stats">
                         <div class="mini">
                             <div class="v" id="msAvg">0</div>
-                            <div class="k">Average Marks</div>
+                            <div class="k">Average Exam Marks</div>
                         </div>
                         <div class="mini">
                             <div class="v" id="msBest">—</div>
@@ -1720,8 +1949,39 @@
             </div>
         </section>
 
+        <!-- EXAM PERFORMANCE & ANALYTICS -->
+        <section class="section reveal" id="analyticsSection">
+            <div class="section-title">
+                <i class="fa-solid fa-chart-column"></i> Examination Performance &amp; Analytics
+                <span class="pill" id="analyticsHint">4 exam types</span>
+                <button class="icon-btn" id="analyticsCollapseBtn" title="Minimize section"
+                    style="width:36px;height:36px">
+                    <i class="fa-solid fa-chevron-up" id="analyticsCollapseIcon"></i>
+                </button>
+            </div>
+
+            <div id="analyticsBody">
+                <nav class="tab-row" id="analyticsTabs"></nav>
+
+                <div class="marks-card" style="margin-bottom:24px">
+                    <h4><span class="ic" style="background:var(--grad)"><i class="fa-solid fa-chart-simple"></i></span>
+                        Marks Comparison Across Exams</h4>
+                    <div class="chart-wrap"><canvas id="marksChart"></canvas></div>
+                </div>
+
+                <div class="three-col" id="marksEntryGrid"></div>
+
+                <div class="glass" style="padding:22px;margin-top:24px">
+                    <h4 style="font-family:'Space Grotesk';margin-bottom:14px;display:flex;align-items:center;gap:8px">
+                        <i class="fa-solid fa-lightbulb" style="color:var(--warn)"></i> Performance Summary
+                    </h4>
+                    <div id="analyticsSummary"></div>
+                </div>
+            </div>
+        </section>
+
         <footer style="text-align:center;color:var(--muted);font-size:.8rem;padding:30px 0">
-           Class 11 Dashboard · <span id="footerYear"></span>
+            Class 11 Dashboard · <span id="footerYear"></span>
         </footer>
     </main>
 
@@ -1742,8 +2002,22 @@
 
     <script>
         /* ==============================================================
-           CLASS11 Personal Dashboard — single-file app
+           CLASS11 Personal Dashboard — single-file app + Supabase sync
            ============================================================== */
+
+        /* ---------- SUPABASE CONFIG ----------
+           1. Go to your Supabase project → Settings → API
+           2. Copy the "Project URL" (already filled below) and the
+              "anon / public" key, and paste the key in place of the
+              placeholder string below.
+           3. Run the SQL provided alongside this file in the Supabase
+              SQL Editor once, to create the required tables.
+        ------------------------------------------------------------- */
+        const SUPABASE_URL = "https://zvarhijyjkbgdwmkmcul.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2YXJoaWp5amtiZ2R3bWttY3VsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NTI1MjcsImV4cCI6MjEwNTIyODUyN30.ysY-S2gTPqNAm41Ek32twusWq3uP2z0hYfdR1eHCICo"; // <-- replace this
+
+        const SB_READY = !!(SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_ANON_KEY.indexOf("PASTE_") !== 0 && window.supabase);
+        const sb = SB_READY ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
         /* ---------- SAMPLE DATA (JSON) ---------- */
         const SUBJECT_META = [
@@ -1754,92 +2028,93 @@
             { key: "english", name: "English", icon: "fa-feather", page: "english.html" },
         ];
 
-    const DEFAULT_CHAPTERS = {
-        chemistry: [
-            "Chapter 1: Some Basic Concepts of Chemistry",
-            "Chapter 2: Structure of Atom",
-            "Chapter 3: Classification of Elements and Periodicity in Properties",
-            "Chapter 4: Chemical Bonding and Molecular Structure",
-            "Chapter 5: Thermodynamics",
-            "Chapter 6: Equilibrium",
-            "Chapter 7: Redox Reactions",
-            "Chapter 8: Organic Chemistry – Some Basic Principles and Techniques",
-            "Chapter 9: Hydrocarbons"
-        ],
+        const EXAM_TYPES = ["Pre-Midterm", "Midterm", "Post-Midterm", "Annual Examination"];
 
-        physics: [
-            "Chapter 1: Units and Measurements",
-            "Chapter 2: Motion in a Straight Line",
-            "Chapter 3: Motion in a Plane",
-            "Chapter 4: Laws of Motion",
-            "Chapter 5: Work, Energy, and Power",
-            "Chapter 6: System of Particles and Rotational Motion",
-            "Chapter 7: Gravitation",
-            "Chapter 8: Mechanical Properties of Solids",
-            "Chapter 9: Mechanical Properties of Fluids",
-            "Chapter 10: Thermal Properties of Matter",
-            "Chapter 11: Thermodynamics",
-            "Chapter 12: Kinetic Theory",
-            "Chapter 13: Oscillations",
-            "Chapter 14: Waves"
-        ],
-
-        maths: [
-            "Chapter 1: Sets",
-            "Chapter 2: Relations and Functions",
-            "Chapter 3: Trigonometric Functions",
-            "Chapter 4: Complex Numbers and Quadratic Equations",
-            "Chapter 5: Linear Inequalities",
-            "Chapter 6: Permutations and Combinations",
-            "Chapter 7: Binomial Theorem",
-            "Chapter 8: Sequences and Series",
-            "Chapter 9: Straight Lines",
-            "Chapter 10: Conic Sections",
-            "Chapter 11: Introduction to Three Dimensional Geometry",
-            "Chapter 12: Limits and Derivatives",
-            "Chapter 13: Statistics",
-            "Chapter 14: Probability"
-        ],
-
-        cs: [
-            "Chapter 1: Computer System",
-            "Chapter 2: Encoding Schemes and Number System",
-            "Chapter 3: Emerging Trends",
-            "Chapter 4: Introduction to Problem Solving",
-            "Chapter 5: Getting Started with Python",
-            "Chapter 6: Flow of Control",
-            "Chapter 7: Functions",
-            "Chapter 8: Strings",
-            "Chapter 9: Lists",
-            "Chapter 10: Tuples and Dictionaries",
-            "Chapter 11: Societal Impact"
-        ],
-
-        english: [
-            "The Portrait of a Lady",
-            "We're Not Afraid to Die... if We Can All Be Together",
-            "Discovering Tut: The Saga Continues",
-            "The Ailing Planet: The Green Movement's Role",
-            "The Adventure",
-            "Silk Road",
-            "A Photograph",
-            "The Laburnum Top",
-            "Voice of the Rain",
-            "Childhood",
-            "Father to Son",
-            "The Summer of the Beautiful White Horse",
-            "The Address",
-            "Ranga's Marriage",
-            "Albert Einstein at School",
-            "Mother's Day",
-            "The Ghat of the Only World",
-            "Birth"
-        ]
-    };
+       const DEFAULT_CHAPTERS = {
+            chemistry: [
+                "Chapter 1: Some Basic Concepts of Chemistry",
+                "Chapter 2: Structure of Atom",
+                "Chapter 3: Classification of Elements and Periodicity in Properties",
+                "Chapter 4: Chemical Bonding and Molecular Structure",
+                "Chapter 5: Thermodynamics",
+                "Chapter 6: Equilibrium",
+                "Chapter 7: Redox Reactions",
+                "Chapter 8: Organic Chemistry – Some Basic Principles and Techniques",
+                "Chapter 9: Hydrocarbons"
+            ],
+            physics: [
+                "Chapter 1: Units and Measurements",
+                "Chapter 2: Motion in a Straight Line",
+                "Chapter 3: Motion in a Plane",
+                "Chapter 4: Laws of Motion",
+                "Chapter 5: Work, Energy, and Power",
+                "Chapter 6: System of Particles and Rotational Motion",
+                "Chapter 7: Gravitation",
+                "Chapter 8: Mechanical Properties of Solids",
+                "Chapter 9: Mechanical Properties of Fluids",
+                "Chapter 10: Thermal Properties of Matter",
+                "Chapter 11: Thermodynamics",
+                "Chapter 12: Kinetic Theory",
+                "Chapter 13: Oscillations",
+                "Chapter 14: Waves"
+            ],
+            maths: [
+                "Chapter 1: Sets",
+                "Chapter 2: Relations and Functions",
+                "Chapter 3: Trigonometric Functions",
+                "Chapter 4: Complex Numbers and Quadratic Equations",
+                "Chapter 5: Linear Inequalities",
+                "Chapter 6: Permutations and Combinations",
+                "Chapter 7: Binomial Theorem",
+                "Chapter 8: Sequences and Series",
+                "Chapter 9: Straight Lines",
+                "Chapter 10: Conic Sections",
+                "Chapter 11: Introduction to Three Dimensional Geometry",
+                "Chapter 12: Limits and Derivatives",
+                "Chapter 13: Statistics",
+                "Chapter 14: Probability"
+            ],
+            cs: [
+                "Chapter 1: Computer System",
+                "Chapter 2: Data representation and boolean logic",
+                "Chapter 3: Getting started with Python",
+                "Chapter 4: Python programming fundamentals",
+                "Chapter 5: Conditional and looping",
+                "Chapter 6: Strings in Python",
+                "Chapter 7: List in Python",
+                "Chapter 8: Tuples and dictionary",
+                "Chapter 9: Introduction to python modules",
+                "Chapter 10: Society Law and ethics",
+                "Chapter 11: Cyber safety"
+            ],
+            english: [
+                "The Portrait of a Lady",
+                "We're Not Afraid to Die... if We Can All Be Together",
+                "Discovering Tut: The Saga Continues",
+                "The Ailing Planet: The Green Movement's Role",
+                "The Adventure",
+                "Silk Road",
+                "A Photograph",
+                "The Laburnum Top",
+                "Voice of the Rain",
+                "Childhood",
+                "Father to Son",
+                "The Summer of the Beautiful White Horse",
+                "The Address",
+                "Ranga's Marriage",
+                "Albert Einstein at School",
+                "Mother's Day",
+                "The Ghat of the Only World",
+                "Birth"
+            ]
+        };
 
         const QUOTES = [
             { q: "The expert in anything was once a beginner.", a: "Helen Hayes" },
-
+            { q: "Success is the sum of small efforts repeated day in and day out.", a: "Robert Collier" },
+            { q: "It always seems impossible until it's done.", a: "Nelson Mandela" },
+            { q: "Discipline is choosing between what you want now and what you want most.", a: "Abraham Lincoln" },
+            { q: "The future depends on what you do today.", a: "Mahatma Gandhi" },
         ];
 
         const FALLBACK_NEWS = [
@@ -1850,10 +2125,10 @@
             { title: "Global climate summit ends with new emission targets", source: "World Affairs", date: "2 days ago" },
         ];
 
-        /* ---------- STORAGE ---------- */
+        /* ---------- LOCAL STORAGE (offline cache / fallback) ---------- */
         const LS = {
             get: (k, fb) => { try { return JSON.parse(localStorage.getItem(k)) ?? fb } catch { return fb } },
-            set: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
+            set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch { } },
         };
 
         /* ---------- STATE ---------- */
@@ -1864,6 +2139,9 @@
             notes: LS.get("c11.notes", ""),
             collapsed: LS.get("c11.collapsed", {}),
             streak: LS.get("c11.streak", { cur: 0, best: 0, last: null, goal: "2h" }),
+            examMarks: LS.get("c11.examMarks", defaultExamMarks()),
+            analyticsCollapsed: LS.get("c11.analyticsCollapsed", false),
+            analyticsSubject: "all",
         };
 
         function defaultChapterState() {
@@ -1874,28 +2152,135 @@
             return o;
         }
         function blankChapter(name) {
-            return { id: crypto.randomUUID(), name, taught: false, learned: false, notes: false, pyq: false, t1: "", t2: "", t3: "" };
+            return { id: crypto.randomUUID(), name, taught: false, learned: false, notes: false, pyq: false };
         }
-        function persist() {
+        function defaultExamMarks() {
+            const o = {};
+            SUBJECT_META.forEach(s => {
+                o[s.key] = {};
+                EXAM_TYPES.forEach(t => { o[s.key][t] = { marks: null, max: 100 } });
+            });
+            return o;
+        }
+        function persistLocal() {
             LS.set("c11.chapters", state.chapters);
             LS.set("c11.todos", state.todos);
             LS.set("c11.exams", state.exams);
             LS.set("c11.notes", state.notes);
             LS.set("c11.collapsed", state.collapsed);
             LS.set("c11.streak", state.streak);
+            LS.set("c11.examMarks", state.examMarks);
+            LS.set("c11.analyticsCollapsed", state.analyticsCollapsed);
+        }
+
+        /* ---------- SUPABASE SYNC LAYER ---------- */
+        let syncPending = 0;
+        function setSyncBadge(mode) {
+            const dot = $("#syncDot"), lbl = $("#syncLabel");
+            if (!dot || !lbl) return;
+            if (!SB_READY) { dot.className = "sync-dot off"; lbl.textContent = "Local only — add anon key"; return }
+            if (mode === "pending") { dot.className = "sync-dot pending"; lbl.textContent = "Syncing…"; return }
+            if (mode === "error") { dot.className = "sync-dot off"; lbl.textContent = "Sync error"; return }
+            dot.className = "sync-dot on"; lbl.textContent = "Synced to Supabase";
+        }
+        async function sbUpsert(table, row, opts) {
+            if (!sb) { setSyncBadge(); return }
+            syncPending++; setSyncBadge("pending");
+            const { error } = await sb.from(table).upsert(row, opts || {});
+            syncPending = Math.max(0, syncPending - 1);
+            if (error) { console.error(table, error); setSyncBadge("error"); toast(`Sync failed (${table}): ${error.message}`, "error", "fa-triangle-exclamation") }
+            else if (syncPending === 0) setSyncBadge("ok");
+        }
+        async function sbDelete(table, match) {
+            if (!sb) return;
+            syncPending++; setSyncBadge("pending");
+            const { error } = await sb.from(table).delete().match(match);
+            syncPending = Math.max(0, syncPending - 1);
+            if (error) { console.error(table, error); setSyncBadge("error"); toast(`Sync failed (${table}): ${error.message}`, "error", "fa-triangle-exclamation") }
+            else if (syncPending === 0) setSyncBadge("ok");
+        }
+
+        async function loadFromSupabase() {
+            if (!sb) { setSyncBadge(); return false }
+            try {
+                const [chaptersR, todosR, examsR, portionsR, marksR, metaR] = await Promise.all([
+                    sb.from("chapters").select("*").order("position", { ascending: true }),
+                    sb.from("todos").select("*").order("created_at", { ascending: true }),
+                    sb.from("exams").select("*").order("exam_date", { ascending: true }),
+                    sb.from("exam_portions").select("*"),
+                    sb.from("exam_marks").select("*"),
+                    sb.from("app_meta").select("*"),
+                ]);
+                [chaptersR, todosR, examsR, portionsR, marksR, metaR].forEach(r => { if (r.error) throw r.error });
+
+                // chapters
+                const chapters = defaultChapterState();
+                if (chaptersR.data && chaptersR.data.length) {
+                    SUBJECT_META.forEach(s => chapters[s.key] = []);
+                    chaptersR.data.forEach(row => {
+                        if (!chapters[row.subject]) chapters[row.subject] = [];
+                        chapters[row.subject].push({ id: row.id, name: row.name, taught: !!row.taught, learned: !!row.learned, notes: !!row.notes, pyq: !!row.pyq });
+                    });
+                }
+
+                // todos
+                const todos = (todosR.data || []).map(r => ({ id: r.id, text: r.text, pri: r.priority, due: r.due_date, done: !!r.done, created: new Date(r.created_at).getTime() }));
+
+                // exams + portions
+                const portionsByExam = {};
+                (portionsR.data || []).forEach(p => {
+                    portionsByExam[p.exam_id] = portionsByExam[p.exam_id] || {};
+                    portionsByExam[p.exam_id][p.subject] = portionsByExam[p.exam_id][p.subject] || [];
+                    portionsByExam[p.exam_id][p.subject].push(p.chapter_id);
+                });
+                const exams = (examsR.data || []).map(r => ({ id: r.id, name: r.name, type: r.type, date: r.exam_date, time: (r.exam_time || "09:00").slice(0, 5), portions: portionsByExam[r.id] || {} }));
+
+                // exam marks
+                const examMarks = defaultExamMarks();
+                (marksR.data || []).forEach(r => {
+                    if (!examMarks[r.subject]) examMarks[r.subject] = {};
+                    examMarks[r.subject][r.exam_type] = { marks: r.marks === null ? null : Number(r.marks), max: r.max_marks == null ? 100 : Number(r.max_marks) };
+                });
+
+                // meta
+                let streak = state.streak, notes = state.notes, analyticsCollapsed = state.analyticsCollapsed;
+                (metaR.data || []).forEach(r => {
+                    if (r.key === "streak") streak = r.value;
+                    if (r.key === "sticky_notes") notes = r.value && r.value.text != null ? r.value.text : "";
+                    if (r.key === "analytics_collapsed") analyticsCollapsed = !!(r.value && r.value.collapsed);
+                });
+
+                state.chapters = chapters;
+                state.todos = todos;
+                state.exams = exams;
+                state.examMarks = examMarks;
+                state.streak = streak;
+                state.notes = notes;
+                state.analyticsCollapsed = analyticsCollapsed;
+                persistLocal();
+                setSyncBadge("ok");
+                return true;
+            } catch (err) {
+                console.error("Supabase load failed, using local cache:", err);
+                setSyncBadge("error");
+                toast("Could not load from Supabase — using local cache", "error", "fa-cloud-arrow-down");
+                return false;
+            }
         }
 
         /* ---------- UTIL ---------- */
         const $ = s => document.querySelector(s);
         const $$ = s => document.querySelectorAll(s);
         const fmtNum = n => Number.isFinite(n) ? n.toFixed(n % 1 ? 1 : 0) : "—";
+        const debounceTimers = {};
+        function debounce(key, fn, ms) { clearTimeout(debounceTimers[key]); debounceTimers[key] = setTimeout(fn, ms) }
 
         function toast(msg, type = "info", icon = "fa-circle-info") {
             const el = document.createElement("div");
             el.className = "toast " + type;
-            el.innerHTML = `<i class="fa-solid ${icon}"></i><span>${msg}</span>`;
+            el.innerHTML = `<i class="fa-solid ${icon}"></i><span>${escapeHtml(msg)}</span>`;
             $("#toastWrap").appendChild(el);
-            setTimeout(() => { el.style.opacity = 0; el.style.transform = "translateX(120%)"; el.style.transition = ".4s"; setTimeout(() => el.remove(), 400) }, 3000);
+            setTimeout(() => { el.style.opacity = 0; el.style.transform = "translateX(120%)"; el.style.transition = ".4s"; setTimeout(() => el.remove(), 400) }, 3200);
         }
 
         function confirmModal(title, msg) {
@@ -1914,13 +2299,9 @@
                 $("#modalCancel").addEventListener("click", no);
             });
         }
+        function escapeHtml(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])) }
 
         /* ---------- COMPUTATIONS ---------- */
-        function chapterAvg(c) {
-            const arr = [c.t1, c.t2, c.t3].map(x => parseFloat(x)).filter(n => !isNaN(n));
-            if (!arr.length) return null;
-            return arr.reduce((a, b) => a + b, 0) / arr.length;
-        }
         function subjectStats(key) {
             const list = state.chapters[key] || [];
             const total = list.length;
@@ -1928,26 +2309,44 @@
             const taught = list.filter(c => c.taught).length;
             const notes = list.filter(c => c.notes).length;
             const pyq = list.filter(c => c.pyq).length;
-            const avgs = list.map(chapterAvg).filter(x => x != null);
-            const avg = avgs.length ? avgs.reduce((a, b) => a + b, 0) / avgs.length : null;
             const pct = total ? Math.round(learned / total * 100) : 0;
-            return { total, learned, taught, notes, pyq, avg, pct };
+            return { total, learned, taught, notes, pyq, pct };
+        }
+        function subjectMarksPct(key, type) {
+            const m = state.examMarks[key] && state.examMarks[key][type];
+            if (!m || m.marks == null || m.marks === "" || !m.max) return null;
+            const v = (parseFloat(m.marks) / parseFloat(m.max)) * 100;
+            return Number.isFinite(v) ? v : null;
+        }
+        function subjectMarksAvg(key) {
+            const vals = EXAM_TYPES.map(t => subjectMarksPct(key, t)).filter(v => v != null);
+            if (!vals.length) return null;
+            return vals.reduce((a, b) => a + b, 0) / vals.length;
+        }
+        function subjectTrend(key) {
+            const vals = EXAM_TYPES.map(t => subjectMarksPct(key, t)).filter(v => v != null);
+            if (vals.length < 2) return { dir: "none", delta: null };
+            const delta = vals[vals.length - 1] - vals[0];
+            if (delta > 4) return { dir: "up", delta };
+            if (delta < -4) return { dir: "down", delta };
+            return { dir: "flat", delta };
         }
         function overallStats() {
-            let total = 0, learned = 0, taught = 0, notes = 0, pyq = 0, avgSum = 0, avgN = 0;
+            let total = 0, learned = 0, taught = 0, notes = 0, pyq = 0;
             let best = { k: null, pct: -1 }, weak = { k: null, pct: 101 };
             SUBJECT_META.forEach(s => {
                 const st = subjectStats(s.key);
                 total += st.total; learned += st.learned; taught += st.taught; notes += st.notes; pyq += st.pyq;
-                if (st.avg != null) { avgSum += st.avg; avgN++; }
                 if (st.total > 0) {
                     if (st.pct > best.pct) { best = { k: s.key, pct: st.pct, name: s.name } }
                     if (st.pct < weak.pct) { weak = { k: s.key, pct: st.pct, name: s.name } }
                 }
             });
+            const marksAvgs = SUBJECT_META.map(s => subjectMarksAvg(s.key)).filter(v => v != null);
+            const avg = marksAvgs.length ? marksAvgs.reduce((a, b) => a + b, 0) / marksAvgs.length : null;
             return {
                 total, learned, taught, notes, pyq,
-                avg: avgN ? avgSum / avgN : null,
+                avg,
                 pct: total ? Math.round(learned / total * 100) : 0,
                 best: best.k ? best.name : "—",
                 weak: weak.k ? weak.name : "—"
@@ -1989,7 +2388,7 @@
                 { ic: "fa-pen-clip", n: o.notes, l: "Notes Completed" },
                 { ic: "fa-clipboard-question", n: o.pyq, l: "PYQs Completed" },
                 { ic: "fa-percent", n: o.pct + "%", l: "Completion" },
-                { ic: "fa-star", n: o.avg == null ? "—" : fmtNum(o.avg), l: "Average Marks" },
+                { ic: "fa-star", n: o.avg == null ? "—" : fmtNum(o.avg) + "%", l: "Average Exam Marks" },
             ];
             const grid = $("#statsGrid"); grid.innerHTML = "";
             cards.forEach((c, i) => {
@@ -2000,15 +2399,13 @@
             });
             animateCounters();
 
-            // overall
             $("#ovDone").textContent = o.learned;
             $("#ovTotal").textContent = o.total;
             $("#ovPct").textContent = o.pct + "%";
-            $("#msAvg").textContent = o.avg == null ? "—" : fmtNum(o.avg);
+            $("#msAvg").textContent = o.avg == null ? "—" : fmtNum(o.avg) + "%";
             $("#msBest").textContent = o.best;
             $("#msWeak").textContent = o.weak;
 
-            // ring
             const C = 2 * Math.PI * 100;
             const ring = $("#ringFg");
             ring.setAttribute("stroke-dasharray", C);
@@ -2028,7 +2425,7 @@
             });
         }
 
-        /* ---------- RENDER: TRACKERS ---------- */
+        /* ---------- RENDER: TRACKERS (no more UT1/2/3 marks — see Exam Analytics section) ---------- */
         function renderTrackers() {
             const list = $("#trackersList"); list.innerHTML = "";
             const sorted = [...SUBJECT_META].sort((a, b) => subjectStats(b.key).pct - subjectStats(a.key).pct);
@@ -2037,7 +2434,6 @@
                 const tracker = document.createElement("div");
                 tracker.className = "subject-tracker" + (state.collapsed[s.key] ? " collapsed" : "");
                 tracker.dataset.subject = s.key;
-                tracker.style.setProperty("--card-grad", `var(--card-grad-${s.key})`);
                 tracker.innerHTML = `
       <div class="tracker-head">
         <div class="ic" style="background:${gradFor(s.key)}"><i class="fa-solid ${s.icon}"></i></div>
@@ -2053,11 +2449,10 @@
       <div class="table-wrap">
         <table class="tracker">
           <thead><tr>
-            <th>Chapter</th><th>Taught</th><th>Learned</th><th>Notes</th><th>PYQs</th>
-            <th>UT 1</th><th>UT 2</th><th>UT 3</th><th>Avg</th><th></th>
+            <th>Chapter</th><th>Taught</th><th>Learned</th><th>Notes</th><th>PYQs</th><th></th>
           </tr></thead>
           <tbody>
-            ${st.total === 0 ? `<tr><td colspan="10" style="color:var(--muted);padding:18px">No chapters yet — add one below.</td></tr>` :
+            ${st.total === 0 ? `<tr><td colspan="6" style="color:var(--muted);padding:18px">No chapters yet — add one below.</td></tr>` :
                         state.chapters[s.key].map(c => chapterRow(s.key, c)).join("")}
           </tbody>
         </table>
@@ -2079,57 +2474,49 @@
             })[k];
         }
         function chapterRow(sk, c) {
-            const avg = chapterAvg(c);
             return `<tr data-id="${c.id}">
     <td>${escapeHtml(c.name)}</td>
     <td><span class="checkbox ${c.taught ? 'on' : ''}" onclick="toggleField('${sk}','${c.id}','taught')"><i class="fa-solid fa-check"></i></span></td>
     <td><span class="checkbox ${c.learned ? 'on' : ''}" onclick="toggleField('${sk}','${c.id}','learned')"><i class="fa-solid fa-check"></i></span></td>
     <td><span class="checkbox ${c.notes ? 'on' : ''}" onclick="toggleField('${sk}','${c.id}','notes')"><i class="fa-solid fa-check"></i></span></td>
     <td><span class="checkbox ${c.pyq ? 'on' : ''}" onclick="toggleField('${sk}','${c.id}','pyq')"><i class="fa-solid fa-check"></i></span></td>
-    <td><input class="mark-input" type="number" min="0" max="100" value="${c.t1}" oninput="setMark('${sk}','${c.id}','t1',this.value)"></td>
-    <td><input class="mark-input" type="number" min="0" max="100" value="${c.t2}" oninput="setMark('${sk}','${c.id}','t2',this.value)"></td>
-    <td><input class="mark-input" type="number" min="0" max="100" value="${c.t3}" oninput="setMark('${sk}','${c.id}','t3',this.value)"></td>
-    <td><b>${avg == null ? "—" : fmtNum(avg)}</b></td>
     <td><button class="btn sm danger" onclick="deleteChapter('${sk}','${c.id}')"><i class="fa-solid fa-trash"></i></button></td>
   </tr>`;
         }
-        function escapeHtml(s) { return String(s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])) }
 
         window.toggleField = (sk, id, f) => {
             const c = state.chapters[sk].find(x => x.id === id); if (!c) return;
             c[f] = !c[f];
-            persist(); renderAll();
+            persistLocal(); renderAll();
+            sbUpsert("chapters", { id: c.id, subject: sk, name: c.name, taught: c.taught, learned: c.learned, notes: c.notes, pyq: c.pyq });
             if (f === "learned" && subjectStats(sk).pct === 100) { confetti(); toast(`${SUBJECT_META.find(s => s.key === sk).name} 100% completed! 🎉`, "success", "fa-trophy") }
         };
-        window.setMark = (sk, id, f, v) => {
-            const c = state.chapters[sk].find(x => x.id === id); if (!c) return;
-            c[f] = v; persist();
-            // update avg cell + stats lightly
-            const row = document.querySelector(`tr[data-id="${id}"]`);
-            if (row) { const avg = chapterAvg(c); row.children[8].innerHTML = `<b>${avg == null ? "—" : fmtNum(avg)}</b>` }
-            renderStats(); renderSubjectNav();
-        };
         window.deleteChapter = async (sk, id) => {
-            const ok = await confirmModal("Delete chapter?", "This will permanently remove the chapter and its marks.");
+            const ok = await confirmModal("Delete chapter?", "This will permanently remove the chapter from this subject and the cloud.");
             if (!ok) return;
             state.chapters[sk] = state.chapters[sk].filter(c => c.id !== id);
-            persist(); renderAll(); toast("Chapter deleted", "info", "fa-trash");
+            persistLocal(); renderAll(); toast("Chapter deleted", "info", "fa-trash");
+            sbDelete("chapters", { id });
         };
         window.addChapter = (sk) => {
             const inp = $("#add-" + sk); const name = inp.value.trim();
             if (!name) return toast("Enter a chapter name", "error", "fa-circle-exclamation");
-            state.chapters[sk].push(blankChapter(name));
-            inp.value = ""; persist(); renderAll(); toast("Chapter added", "success", "fa-circle-check");
+            const c = blankChapter(name);
+            state.chapters[sk].push(c);
+            inp.value = ""; persistLocal(); renderAll(); toast("Chapter added", "success", "fa-circle-check");
+            sbUpsert("chapters", { id: c.id, subject: sk, name: c.name, taught: false, learned: false, notes: false, pyq: false, position: state.chapters[sk].length });
         };
-        window.toggleCollapse = (sk) => { state.collapsed[sk] = !state.collapsed[sk]; persist(); renderTrackers() };
+        window.toggleCollapse = (sk) => { state.collapsed[sk] = !state.collapsed[sk]; persistLocal(); renderTrackers() };
 
         /* ---------- TO-DO ---------- */
         $("#todoForm").addEventListener("submit", e => {
             e.preventDefault();
             const t = $("#todoText").value.trim(); if (!t) return;
-            state.todos.push({ id: crypto.randomUUID(), text: t, pri: $("#todoPri").value, due: $("#todoDate").value || null, done: false, created: Date.now() });
+            const row = { id: crypto.randomUUID(), text: t, pri: $("#todoPri").value, due: $("#todoDate").value || null, done: false, created: Date.now() };
+            state.todos.push(row);
             $("#todoText").value = ""; $("#todoDate").value = "";
-            persist(); renderTodos(); toast("Task added", "success", "fa-circle-check");
+            persistLocal(); renderTodos(); toast("Task added", "success", "fa-circle-check");
+            sbUpsert("todos", { id: row.id, text: row.text, priority: row.pri, due_date: row.due, done: row.done });
         });
         function renderTodos() {
             const today = new Date().toISOString().slice(0, 10);
@@ -2158,13 +2545,17 @@
             $("#todoUpcoming").innerHTML = render(lists.upcoming);
             $("#todoDone").innerHTML = render(lists.done);
         }
-        window.toggleTodo = id => { const t = state.todos.find(x => x.id === id); if (!t) return; t.done = !t.done; persist(); renderTodos() };
+        window.toggleTodo = id => {
+            const t = state.todos.find(x => x.id === id); if (!t) return; t.done = !t.done; persistLocal(); renderTodos();
+            sbUpsert("todos", { id: t.id, text: t.text, priority: t.pri, due_date: t.due, done: t.done });
+        };
         window.deleteTodo = async id => {
             const ok = await confirmModal("Delete task?", "This will remove the task permanently.");
-            if (!ok) return; state.todos = state.todos.filter(t => t.id !== id); persist(); renderTodos(); toast("Task deleted", "info", "fa-trash");
+            if (!ok) return; state.todos = state.todos.filter(t => t.id !== id); persistLocal(); renderTodos(); toast("Task deleted", "info", "fa-trash");
+            sbDelete("todos", { id });
         };
 
-        /* ---------- EXAMS ---------- */
+        /* ---------- EXAMS (schedule / countdown) ---------- */
         $("#examForm").addEventListener("submit", e => {
             e.preventDefault();
             const exam = {
@@ -2178,7 +2569,8 @@
             if (!exam.name || !exam.date) return;
             state.exams.push(exam);
             $("#examName").value = ""; $("#examDate").value = "";
-            persist(); renderExams(); toast("Exam added", "success", "fa-calendar-plus");
+            persistLocal(); renderExams(); toast("Exam added", "success", "fa-calendar-plus");
+            sbUpsert("exams", { id: exam.id, name: exam.name, type: exam.type, exam_date: exam.date, exam_time: exam.time });
         });
         function renderExams() {
             const list = $("#examList"); list.innerHTML = "";
@@ -2195,7 +2587,7 @@
                 card.innerHTML = `
       <div class="top">
         <div>
-          <div class="type-tag">${ex.type}${ex.id === nextId ? ' · Next up' : ''}</div>
+          <div class="type-tag">${escapeHtml(ex.type)}${ex.id === nextId ? ' · Next up' : ''}</div>
           <h4>${escapeHtml(ex.name)}</h4>
           <div style="font-size:.78rem;color:var(--muted);margin-top:2px"><i class="fa-regular fa-calendar"></i> ${ex.date} at ${ex.time}</div>
         </div>
@@ -2231,12 +2623,14 @@
         window.togglePortion = (eid, sk, cid, on) => {
             const ex = state.exams.find(e => e.id === eid); if (!ex) return;
             ex.portions[sk] = ex.portions[sk] || [];
-            if (on) ex.portions[sk].push(cid); else ex.portions[sk] = ex.portions[sk].filter(x => x !== cid);
-            persist(); renderExams(); $("#pp-" + eid).classList.add("open");
+            if (on) { if (!ex.portions[sk].includes(cid)) ex.portions[sk].push(cid); sbUpsert("exam_portions", { exam_id: eid, subject: sk, chapter_id: cid }, { onConflict: "exam_id,subject,chapter_id" }); }
+            else { ex.portions[sk] = ex.portions[sk].filter(x => x !== cid); sbDelete("exam_portions", { exam_id: eid, subject: sk, chapter_id: cid }); }
+            persistLocal(); renderExams(); $("#pp-" + eid).classList.add("open");
         };
         window.deleteExam = async id => {
-            const ok = await confirmModal("Delete exam?", "This exam and its portions will be removed.");
-            if (!ok) return; state.exams = state.exams.filter(e => e.id !== id); persist(); renderExams(); toast("Exam deleted", "info", "fa-trash");
+            const ok = await confirmModal("Delete exam?", "This exam and its portions will be removed from the cloud too.");
+            if (!ok) return; state.exams = state.exams.filter(e => e.id !== id); persistLocal(); renderExams(); toast("Exam deleted", "info", "fa-trash");
+            sbDelete("exams", { id });
         };
         function updateCountdowns() {
             $$("[data-cd]").forEach(box => {
@@ -2256,6 +2650,147 @@
             });
         }
         setInterval(updateCountdowns, 1000);
+
+        /* ---------- EXAM PERFORMANCE & ANALYTICS ---------- */
+        let marksChartInstance = null;
+
+        function renderAnalyticsTabs() {
+            const wrap = $("#analyticsTabs"); wrap.innerHTML = "";
+            const items = [{ key: "all", name: "All Subjects", icon: "fa-layer-group" }, ...SUBJECT_META];
+            items.forEach(it => {
+                const b = document.createElement("button");
+                b.className = "tab-pill" + (state.analyticsSubject === it.key ? " active" : "");
+                b.innerHTML = `<i class="fa-solid ${it.icon || 'fa-book'}"></i> ${it.name}`;
+                b.onclick = () => { state.analyticsSubject = it.key; renderAnalyticsTabs(); renderMarksChart(); };
+                wrap.appendChild(b);
+            });
+        }
+
+        function renderMarksEntryGrid() {
+            const grid = $("#marksEntryGrid"); grid.innerHTML = "";
+            const subs = state.analyticsSubject === "all" ? SUBJECT_META : SUBJECT_META.filter(s => s.key === state.analyticsSubject);
+            subs.forEach(s => {
+                const trend = subjectTrend(s.key);
+                const avg = subjectMarksAvg(s.key);
+                const card = document.createElement("div");
+                card.className = "marks-card";
+                card.innerHTML = `
+      <h4><span class="ic" style="background:${gradFor(s.key)}"><i class="fa-solid ${s.icon}"></i></span>${s.name}
+        <span class="trend-tag ${trend.dir}">${trendLabel(trend)}</span>
+      </h4>
+      ${EXAM_TYPES.map(t => {
+                    const m = state.examMarks[s.key][t] || { marks: null, max: 100 };
+                    return `<div class="marks-row">
+          <label>${t}</label>
+          <div class="mi-wrap">
+            <input type="number" min="0" max="${m.max}" placeholder="—" value="${m.marks == null ? '' : m.marks}"
+              oninput="setExamMark('${s.key}','${t}','marks',this.value)">
+            <span class="slash">/</span>
+            <input type="number" min="1" value="${m.max}" style="width:46px"
+              oninput="setExamMark('${s.key}','${t}','max',this.value)">
+          </div>
+        </div>`;
+                }).join("")}
+      <div class="marks-card-avg"><i class="fa-solid fa-chart-simple"></i> Average <b>${avg == null ? "—" : fmtNum(avg) + "%"}</b></div>`;
+                grid.appendChild(card);
+            });
+        }
+        function trendLabel(t) {
+            if (t.dir === "none") return "No trend yet";
+            if (t.dir === "up") return `Improving +${fmtNum(t.delta)}%`;
+            if (t.dir === "down") return `Dropping ${fmtNum(t.delta)}%`;
+            return "Steady";
+        }
+
+        window.setExamMark = (sk, type, field, val) => {
+            const rec = state.examMarks[sk][type];
+            if (field === "marks") rec.marks = val === "" ? null : parseFloat(val);
+            if (field === "max") rec.max = val === "" ? 100 : parseFloat(val);
+            persistLocal();
+            renderStats(); renderSubjectNav(); renderMarksChart(); renderAnalyticsSummary();
+            // update just this card's trend/avg without a full re-render to keep focus in the input
+            debounce("examMark-" + sk, () => {
+                sbUpsert("exam_marks", { subject: sk, exam_type: type, marks: rec.marks, max_marks: rec.max }, { onConflict: "subject,exam_type" });
+            }, 500);
+        };
+
+        function renderMarksChart() {
+            const ctx = document.getElementById("marksChart"); if (!ctx || typeof Chart === "undefined") return;
+            const colors = { physics: "#7c5cff", maths: "#ff5cf2", chemistry: "#3ddc97", cs: "#ffb547", english: "#22d3ee" };
+            const subs = state.analyticsSubject === "all" ? SUBJECT_META : SUBJECT_META.filter(s => s.key === state.analyticsSubject);
+            const datasets = subs.map(s => ({
+                label: s.name,
+                data: EXAM_TYPES.map(t => { const v = subjectMarksPct(s.key, t); return v == null ? null : Math.round(v * 10) / 10 }),
+                backgroundColor: colors[s.key],
+                borderColor: colors[s.key],
+                borderRadius: 6,
+                spanGaps: true,
+            }));
+            if (marksChartInstance) marksChartInstance.destroy();
+            const isLight = document.documentElement.dataset.theme === "light";
+            const gridColor = isLight ? "rgba(20,20,40,0.08)" : "rgba(255,255,255,0.08)";
+            const textColor = isLight ? "#555a85" : "#9aa0c5";
+            marksChartInstance = new Chart(ctx, {
+                type: subs.length === 1 ? "line" : "bar",
+                data: { labels: EXAM_TYPES, datasets },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: textColor } }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${c.formattedValue}%` } } },
+                    scales: {
+                        x: { ticks: { color: textColor }, grid: { color: gridColor } },
+                        y: { min: 0, max: 100, ticks: { color: textColor, callback: v => v + "%" }, grid: { color: gridColor } }
+                    }
+                }
+            });
+        }
+
+        function renderAnalyticsSummary() {
+            const box = $("#analyticsSummary"); box.innerHTML = "";
+            const lines = [];
+            const withAvg = SUBJECT_META.map(s => ({ s, avg: subjectMarksAvg(s.key), trend: subjectTrend(s.key) })).filter(x => x.avg != null);
+
+            if (!withAvg.length) {
+                box.innerHTML = `<div class="summary-line"><span class="ic info"><i class="fa-solid fa-circle-info"></i></span><div>Enter marks for at least one exam to see performance analytics here.</div></div>`;
+                return;
+            }
+
+            const bySubject = [...withAvg].sort((a, b) => b.avg - a.avg);
+            const best = bySubject[0], weak = bySubject[bySubject.length - 1];
+            lines.push({ type: "good", icon: "fa-trophy", html: `<b>${escapeHtml(best.s.name)}</b> is the strongest subject right now, averaging <b>${fmtNum(best.avg)}%</b> across recorded exams.` });
+            if (weak.s.key !== best.s.key) {
+                lines.push({ type: "warn", icon: "fa-triangle-exclamation", html: `<b>${escapeHtml(weak.s.name)}</b> needs the most attention, averaging <b>${fmtNum(weak.avg)}%</b> — consider extra revision time here.` });
+            }
+
+            withAvg.forEach(({ s, trend }) => {
+                if (trend.dir === "up") lines.push({ type: "good", icon: "fa-arrow-trend-up", html: `<b>${escapeHtml(s.name)}</b> is improving — up <b>${fmtNum(trend.delta)}%</b> from the first to the latest recorded exam.` });
+                else if (trend.dir === "down") lines.push({ type: "warn", icon: "fa-arrow-trend-down", html: `<b>${escapeHtml(s.name)}</b> has dropped <b>${fmtNum(Math.abs(trend.delta))}%</b> since the first recorded exam — worth revisiting recent chapters.` });
+                else if (trend.dir === "flat") lines.push({ type: "info", icon: "fa-minus", html: `<b>${escapeHtml(s.name)}</b> is holding steady across exams (change under 4%).` });
+            });
+
+            const overallAvg = withAvg.reduce((a, x) => a + x.avg, 0) / withAvg.length;
+            lines.push({ type: "info", icon: "fa-chart-simple", html: `Overall average across all recorded exams and subjects: <b>${fmtNum(overallAvg)}%</b>.` });
+
+            box.innerHTML = lines.map(l => `<div class="summary-line"><span class="ic ${l.type}"><i class="fa-solid ${l.icon}"></i></span><div>${l.html}</div></div>`).join("");
+        }
+
+        $("#analyticsCollapseBtn").addEventListener("click", () => {
+            state.analyticsCollapsed = !state.analyticsCollapsed;
+            persistLocal();
+            paintAnalyticsCollapse();
+            sbUpsert("app_meta", { key: "analytics_collapsed", value: { collapsed: state.analyticsCollapsed } }, { onConflict: "key" });
+        });
+        function paintAnalyticsCollapse() {
+            $("#analyticsBody").classList.toggle("collapsed", state.analyticsCollapsed);
+            $("#analyticsCollapseIcon").className = "fa-solid fa-chevron-" + (state.analyticsCollapsed ? "down" : "up");
+        }
+
+        function renderAnalytics() {
+            renderAnalyticsTabs();
+            renderMarksEntryGrid();
+            renderMarksChart();
+            renderAnalyticsSummary();
+            paintAnalyticsCollapse();
+        }
 
         /* ---------- QUOTE ---------- */
         function refreshQuote() {
@@ -2345,8 +2880,10 @@
         });
 
         /* ---------- NOTES ---------- */
-        $("#stickyNotes").value = state.notes;
-        $("#stickyNotes").addEventListener("input", e => { state.notes = e.target.value; persist() });
+        $("#stickyNotes").addEventListener("input", e => {
+            state.notes = e.target.value; persistLocal();
+            debounce("notes", () => sbUpsert("app_meta", { key: "sticky_notes", value: { text: state.notes } }, { onConflict: "key" }), 700);
+        });
 
         /* ---------- STREAK ---------- */
         function paintStreak() {
@@ -2362,8 +2899,9 @@
             const yest = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
             state.streak.cur = state.streak.last === yest ? state.streak.cur + 1 : 1;
             state.streak.best = Math.max(state.streak.best, state.streak.cur);
-            state.streak.last = today; persist(); paintStreak();
+            state.streak.last = today; persistLocal(); paintStreak();
             toast(`Streak: ${state.streak.cur} days 🔥`, "success", "fa-fire");
+            sbUpsert("app_meta", { key: "streak", value: state.streak }, { onConflict: "key" });
         }
         window.logStudyDay = logStudyDay;
 
@@ -2414,6 +2952,7 @@
             document.documentElement.dataset.theme = next;
             LS.set("c11.theme", next);
             $("#themeToggle").innerHTML = next === "dark" ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
+            renderMarksChart();
         });
         const savedTheme = LS.get("c11.theme", "dark");
         document.documentElement.dataset.theme = savedTheme;
@@ -2434,11 +2973,22 @@
 
         /* ---------- RENDER ALL ---------- */
         function renderAll() {
-            renderSubjectNav(); renderStats(); renderTrackers(); renderTodos(); renderExams(); renderFocus(); paintStreak();
+            renderSubjectNav(); renderStats(); renderTrackers(); renderTodos(); renderExams(); renderAnalytics(); renderFocus(); paintStreak();
         }
-        renderAll();
-        refreshQuote(); loadWeather(); loadNews();
-        $("#footerYear").textContent = new Date().getFullYear();
+
+        /* ---------- BOOT ---------- */
+        async function boot() {
+            setSyncBadge("pending");
+            const ok = await loadFromSupabase();
+            $("#stickyNotes").value = state.notes || "";
+            renderAll();
+            refreshQuote(); loadWeather(); loadNews();
+            $("#footerYear").textContent = new Date().getFullYear();
+            if (!SB_READY) toast("Running local-only — add your Supabase anon key in the script to enable cloud sync", "info", "fa-cloud");
+            else if (!ok) toast("Loaded from local cache — check your Supabase tables/keys", "error", "fa-triangle-exclamation");
+            else toast("Synced with Supabase", "success", "fa-cloud-arrow-down");
+        }
+        boot();
     </script>
 </body>
 
