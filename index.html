@@ -641,7 +641,108 @@
             grid-template-columns: 2fr 1fr;
             gap: 24px
         }
+/* =========================================================
+   DASHBOARD NAVIGATION
+   ========================================================= */
 
+.dashboard-nav {
+    position: sticky;
+    top: 82px;
+    z-index: 100;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 10px;
+    margin: 0 0 28px;
+
+    background: rgba(15, 14, 30, 0.82);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    border: 1px solid var(--border);
+    border-radius: 18px;
+
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.dashboard-nav::-webkit-scrollbar {
+    display: none;
+}
+
+.dashboard-nav a {
+    flex: 0 0 auto;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 10px 15px;
+
+    color: var(--muted);
+    text-decoration: none;
+
+    border: 1px solid transparent;
+    border-radius: 12px;
+
+    font-size: .88rem;
+    font-weight: 600;
+
+    transition: .25s ease;
+}
+
+.dashboard-nav a:hover {
+    color: var(--text);
+    background: var(--surface);
+    border-color: var(--border);
+    transform: translateY(-1px);
+}
+
+.dashboard-nav a.active {
+    color: white;
+    background: var(--grad);
+    border-color: transparent;
+    box-shadow: 0 8px 25px rgba(124, 92, 255, .25);
+}
+
+/* Full-width dashboard sections */
+.full-width-section {
+    width: 100%;
+}
+
+/* Remove old two-column behavior for main content */
+.full-width-section .two-col {
+    grid-template-columns: 1fr;
+}
+
+/* Chapters should use the entire available width */
+#trackersList {
+    width: 100%;
+}
+
+/* Todo + exams side by side on desktop */
+.manager-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+@media (max-width: 800px) {
+    .manager-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Smooth navigation */
+html {
+    scroll-behavior: smooth;
+}
+
+[id] {
+    scroll-margin-top: 125px;
+}
         .three-col {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -1741,8 +1842,48 @@
 
     <main class="container">
 
+        <!-- DASHBOARD NAVIGATION -->
+        <nav class="dashboard-nav" id="dashboardNav">
+        
+            <a href="#home">
+                <i class="fa-solid fa-house"></i>
+                Home
+            </a>
+        
+            <a href="#subjects">
+                <i class="fa-solid fa-book-open"></i>
+                Subjects
+            </a>
+        
+            <a href="#progress">
+                <i class="fa-solid fa-chart-pie"></i>
+                Progress
+            </a>
+        
+            <a href="#chapters">
+                <i class="fa-solid fa-list-check"></i>
+                Chapters
+            </a>
+        
+            <a href="#todo">
+                <i class="fa-solid fa-clipboard-list"></i>
+                To-Do
+            </a>
+        
+            <a href="#exams">
+                <i class="fa-solid fa-graduation-cap"></i>
+                Exams
+            </a>
+        
+            <a href="#analytic">
+                <i class="fa-solid fa-chart-column"></i>
+                Analytics
+            </a>
+        
+        </nav>
+
         <!-- HERO -->
-        <section class="hero reveal">
+        <section class="hero reveal" id="home">
             <h2><span class="grad">Welcome back, Yadhav.</span><br />Let's make today count.</h2>
             <p class="sub">Track every chapter, master every test, and stay ahead of every deadline — your premium
                 command center for Class 11, synced to the cloud.</p>
@@ -1755,14 +1896,14 @@
         </section>
 
         <!-- SUBJECT NAV -->
-        <section class="section reveal">
+        <section class="section reveal" id="subjects">
             <div class="section-title"><i class="fa-solid fa-book-open"></i> Subjects <span class="pill">Quick
                     navigation</span></div>
             <nav class="subjects-nav" id="subjectsNav"></nav>
         </section>
 
         <!-- OVERALL PROGRESS -->
-        <section class="section reveal">
+        <section class="section reveal" id="progress">
             <div class="overall">
                 <div class="ring-wrap">
                     <svg width="240" height="240" viewBox="0 0 240 240">
@@ -1805,106 +1946,32 @@
         </section>
 
         <!-- STATS -->
-        <section class="section reveal">
+        <section class="section reveal" id="subjects">
             <div class="section-title"><i class="fa-solid fa-chart-line"></i> Dashboard Statistics</div>
             <div class="stats-grid" id="statsGrid"></div>
         </section>
+<!-- CHAPTER TRACKERS -->
+<section class="section reveal full-width-section" id="chapters">
 
-        <!-- MAIN GRID -->
-        <section class="section reveal">
-            <div class="two-col">
-                <!-- Trackers -->
-                <div>
-                    <div class="section-title"><i class="fa-solid fa-list-check"></i> Chapter Trackers <span
-                            class="pill" id="trackersHint">Sorted by completion</span></div>
-                    <div id="trackersList"></div>
-                </div>
+    <div class="section-title">
+        <i class="fa-solid fa-list-check"></i>
+        Chapter Trackers
 
-                <!-- side widgets -->
-                <div>
-                    <div class="widget">
-                        <h3><i class="fa-solid fa-cloud-sun"></i> Weather <span
-                                style="margin-left:auto;font-size:.7rem;color:var(--muted)" id="weatherLoc">Kozhikode,
-                                Kerala</span></h3>
-                        <div class="weather-main">
-                            <div class="weather-icon"><i class="fa-solid fa-cloud-sun" id="weatherIcon"></i></div>
-                            <div>
-                                <div class="weather-temp" id="weatherTemp">--°</div>
-                                <div class="weather-cond" id="weatherCond">Loading…</div>
-                            </div>
-                        </div>
-                        <div class="weather-meta">
-                            <div><i class="fa-solid fa-droplet"></i> Humidity <b id="weatherHum">—</b></div>
-                            <div><i class="fa-solid fa-temperature-half"></i> Feels <b id="weatherFeel">—</b></div>
-                            <div><i class="fa-solid fa-umbrella"></i> Rain <b id="weatherRain">—</b></div>
-                            <div><i class="fa-solid fa-wind"></i> Wind <b id="weatherWind">—</b></div>
-                        </div>
-                    </div>
+        <span class="pill" id="trackersHint">
+            Sorted by completion
+        </span>
+    </div>
 
-                    <div class="widget">
-                        <h3><i class="fa-solid fa-quote-left"></i> Quote of the Day
-                            <button class="btn sm" style="margin-left:auto" onclick="refreshQuote()"><i
-                                    class="fa-solid fa-rotate"></i></button>
-                        </h3>
-                        <div class="quote-box" id="quoteBox">Loading…<div class="quote-author" id="quoteAuthor"></div>
-                        </div>
-                    </div>
+    <div id="trackersList"></div>
 
-                    <div class="widget">
-                        <h3><i class="fa-solid fa-newspaper"></i> Current Affairs
-                            <button class="btn sm" style="margin-left:auto" onclick="loadNews()"><i
-                                    class="fa-solid fa-rotate"></i></button>
-                        </h3>
-                        <div id="newsList"></div>
-                    </div>
-
-                    <div class="widget">
-                        <h3><i class="fa-solid fa-fire-flame-curved"></i> Study Streak</h3>
-                        <div class="streak-row">
-                            <div><b id="streakCur">0</b><span>Current</span></div>
-                            <div><b id="streakBest">0</b><span>Best</span></div>
-                            <div><b id="streakGoal">2h</b><span>Daily Goal</span></div>
-                        </div>
-                        <button class="btn primary" style="margin-top:14px;width:100%" onclick="logStudyDay()"><i
-                                class="fa-solid fa-check"></i> I studied today</button>
-                    </div>
-
-                    <div class="widget">
-                        <h3><i class="fa-solid fa-clock"></i> Pomodoro Timer</h3>
-                        <div class="pomo">
-                            <div class="pomo-time" id="pomoTime">25:00</div>
-                            <div class="pomo-mode" id="pomoMode">Focus · 25/5</div>
-                            <div class="pomo-controls">
-                                <button class="btn primary" id="pomoStart"><i class="fa-solid fa-play"></i>
-                                    Start</button>
-                                <button class="btn" id="pomoReset"><i class="fa-solid fa-rotate-left"></i>
-                                    Reset</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="widget">
-                        <h3><i class="fa-solid fa-note-sticky"></i> Sticky Notes</h3>
-                        <textarea id="stickyNotes" placeholder="Quick thoughts, formulas, reminders…"></textarea>
-                    </div>
-
-                    <div class="widget">
-                        <h3><i class="fa-solid fa-bullseye"></i> Today's Focus</h3>
-                        <ul class="focus-list" id="focusList"></ul>
-                    </div>
-
-                    <div class="widget">
-                        <h3><i class="fa-solid fa-rotate"></i> Revision Reminders</h3>
-                        <ul class="focus-list" id="revisionList"></ul>
-                    </div>
-                </div>
-            </div>
-        </section>
+</section>
 
         <!-- TODO + EXAMS -->
-        <section class="section reveal">
-            <div class="two-col">
-                <div class="glass" style="padding:22px">
+<!-- TODO + EXAMS -->
+<section class="section reveal" id="todo">
+
+    <div class="manager-grid">
+                <div class="glass" style="padding:22px" id="todoManager">
                     <div class="section-title"><i class="fa-solid fa-clipboard-list"></i> To-Do Manager</div>
                     <form class="todo-form" id="todoForm">
                         <input type="text" id="todoText" placeholder="What needs to be done?" required>
@@ -1930,7 +1997,7 @@
                     </div>
                 </div>
 
-                <div class="glass" style="padding:22px">
+                <div class="glass" style="padding:22px" id="exams">
                     <div class="section-title"><i class="fa-solid fa-graduation-cap"></i> Examination Manager</div>
                     <form class="exam-form" id="examForm">
                         <input type="text" id="examName" placeholder="Exam name (e.g. Physics)" required>
@@ -1950,7 +2017,7 @@
         </section>
 
         <!-- EXAM PERFORMANCE & ANALYTICS -->
-        <section class="section reveal" id="analyticsSection">
+        <section class="section reveal" id="analytic">
             <div class="section-title">
                 <i class="fa-solid fa-chart-column"></i> Examination Performance &amp; Analytics
                 <span class="pill" id="analyticsHint">4 exam types</span>
@@ -2792,54 +2859,9 @@
             paintAnalyticsCollapse();
         }
 
-        /* ---------- QUOTE ---------- */
-        function refreshQuote() {
-            const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
-            const box = $("#quoteBox");
-            box.style.opacity = 0; box.style.transition = ".3s";
-            setTimeout(() => {
-                box.innerHTML = `${escapeHtml(q.q)}<div class="quote-author">— ${escapeHtml(q.a)}</div>`;
-                box.style.opacity = 1;
-            }, 250);
-        }
-        window.refreshQuote = refreshQuote;
 
-        /* ---------- NEWS (free, no API key — Hacker News Algolia) ---------- */
-        async function loadNews() {
-            const list = $("#newsList");
-            list.innerHTML = `<div style="color:var(--muted);font-size:.82rem">Loading headlines…</div>`;
-            try {
-                const r = await fetch("https://hn.algolia.com/api/v1/search?tags=front_page");
-                if (!r.ok) throw new Error("net");
-                const d = await r.json();
-                const items = (d.hits || []).slice(0, 5).map(h => ({ title: h.title || h.story_title, source: "Hacker News", date: new Date(h.created_at).toLocaleDateString(), url: h.url || `https://news.ycombinator.com/item?id=${h.objectID}` }));
-                if (!items.length) throw new Error("empty");
-                list.innerHTML = items.map(i => `<div class="news-item"><a href="${i.url}" target="_blank" rel="noopener">${escapeHtml(i.title)}</a><div class="meta">${i.source} · ${i.date}</div></div>`).join("");
-            } catch {
-                list.innerHTML = FALLBACK_NEWS.map(i => `<div class="news-item"><a href="#" onclick="return false">${escapeHtml(i.title)}</a><div class="meta">${i.source} · ${i.date}</div></div>`).join("");
-            }
-        }
-        window.loadNews = loadNews;
-
-        /* ---------- WEATHER (Open-Meteo, no key) ---------- */
-        async function loadWeather() {
-            const lat = 11.2588, lon = 75.7804; // Kozhikode, Kerala
-            try {
-                const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation_probability,weather_code,wind_speed_10m&timezone=auto`);
-                const d = await r.json(); const c = d.current;
-                $("#weatherTemp").textContent = Math.round(c.temperature_2m) + "°C";
-                $("#weatherCond").textContent = wcode(c.weather_code);
-                $("#weatherHum").textContent = c.relative_humidity_2m + "%";
-                $("#weatherFeel").textContent = Math.round(c.apparent_temperature) + "°C";
-                $("#weatherRain").textContent = (c.precipitation_probability ?? 0) + "%";
-                $("#weatherWind").textContent = Math.round(c.wind_speed_10m) + " km/h";
-                $("#weatherIcon").className = "fa-solid " + wicon(c.weather_code);
-            } catch {
-                $("#weatherTemp").textContent = "29°C"; $("#weatherCond").textContent = "Partly cloudy";
-                $("#weatherHum").textContent = "78%"; $("#weatherFeel").textContent = "33°C"; $("#weatherRain").textContent = "40%"; $("#weatherWind").textContent = "12 km/h";
-            }
-        }
-        function wcode(c) {
+      
+       function wcode(c) {
             if (c === 0) return "Clear sky"; if ([1, 2].includes(c)) return "Partly cloudy"; if (c === 3) return "Overcast";
             if ([45, 48].includes(c)) return "Fog"; if ([51, 53, 55].includes(c)) return "Drizzle";
             if ([61, 63, 65, 80, 81, 82].includes(c)) return "Rain"; if ([71, 73, 75, 77, 85, 86].includes(c)) return "Snow";
@@ -2851,83 +2873,7 @@
             if ([71, 73, 75, 77, 85, 86].includes(c)) return "fa-snowflake"; if ([95, 96, 99].includes(c)) return "fa-cloud-bolt";
             return "fa-cloud-sun";
         }
-
-        /* ---------- POMODORO ---------- */
-        let pomo = { t: 25 * 60, run: false, mode: "focus", int: null };
-        function pomoTick() {
-            pomo.t--;
-            if (pomo.t < 0) {
-                pomo.mode = pomo.mode === "focus" ? "break" : "focus";
-                pomo.t = (pomo.mode === "focus" ? 25 : 5) * 60;
-                toast(pomo.mode === "focus" ? "Break over — back to focus!" : "Focus done — take a break.", "success", "fa-bell");
-            }
-            paintPomo();
-        }
-        function paintPomo() {
-            const m = String(Math.floor(pomo.t / 60)).padStart(2, "0");
-            const s = String(pomo.t % 60).padStart(2, "0");
-            $("#pomoTime").textContent = `${m}:${s}`;
-            $("#pomoMode").textContent = (pomo.mode === "focus" ? "Focus" : "Break") + " · 25/5";
-        }
-        $("#pomoStart").addEventListener("click", () => {
-            pomo.run = !pomo.run;
-            $("#pomoStart").innerHTML = pomo.run ? '<i class="fa-solid fa-pause"></i> Pause' : '<i class="fa-solid fa-play"></i> Start';
-            if (pomo.run) { pomo.int = setInterval(pomoTick, 1000) } else clearInterval(pomo.int);
-        });
-        $("#pomoReset").addEventListener("click", () => {
-            clearInterval(pomo.int); pomo.run = false; pomo.mode = "focus"; pomo.t = 25 * 60;
-            $("#pomoStart").innerHTML = '<i class="fa-solid fa-play"></i> Start'; paintPomo();
-        });
-
-        /* ---------- NOTES ---------- */
-        $("#stickyNotes").addEventListener("input", e => {
-            state.notes = e.target.value; persistLocal();
-            debounce("notes", () => sbUpsert("app_meta", { key: "sticky_notes", value: { text: state.notes } }, { onConflict: "key" }), 700);
-        });
-
-        /* ---------- STREAK ---------- */
-        function paintStreak() {
-            $("#streakCur").textContent = state.streak.cur;
-            $("#streakBest").textContent = state.streak.best;
-            $("#streakGoal").textContent = state.streak.goal;
-            $("#heroStreak").textContent = state.streak.cur;
-            $("#heroGoal").textContent = state.streak.goal;
-        }
-        function logStudyDay() {
-            const today = new Date().toISOString().slice(0, 10);
-            if (state.streak.last === today) { toast("Already logged today ✨", "info", "fa-star"); return }
-            const yest = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-            state.streak.cur = state.streak.last === yest ? state.streak.cur + 1 : 1;
-            state.streak.best = Math.max(state.streak.best, state.streak.cur);
-            state.streak.last = today; persistLocal(); paintStreak();
-            toast(`Streak: ${state.streak.cur} days 🔥`, "success", "fa-fire");
-            sbUpsert("app_meta", { key: "streak", value: state.streak }, { onConflict: "key" });
-        }
-        window.logStudyDay = logStudyDay;
-
-        /* ---------- FOCUS + REVISION ---------- */
-        function renderFocus() {
-            const ul = $("#focusList");
-            const items = [];
-            SUBJECT_META.forEach(s => {
-                const list = state.chapters[s.key];
-                const next = list.find(c => !c.learned);
-                if (next) items.push(`${s.name}: ${next.name}`);
-            });
-            ul.innerHTML = (items.slice(0, 5).map(t => `<li><i class="fa-solid fa-circle-dot"></i> ${escapeHtml(t)}</li>`).join("")) || `<li><i class="fa-solid fa-trophy"></i> All caught up! 🎉</li>`;
-
-            const rev = $("#revisionList");
-            const revItems = [];
-            SUBJECT_META.forEach(s => {
-                const st = subjectStats(s.key);
-                if (st.total && st.pct < 60) revItems.push(`${s.name} needs revision (${st.pct}%)`);
-            });
-            const totalLeft = overallStats().total - overallStats().learned;
-            const estDays = totalLeft ? Math.ceil(totalLeft / 1.5) : 0;
-            revItems.push(`Estimated ${estDays} days to finish all chapters at 1.5/day`);
-            rev.innerHTML = revItems.map(t => `<li><i class="fa-solid fa-arrow-right-rotate"></i> ${escapeHtml(t)}</li>`).join("");
-        }
-
+   
         /* ---------- CONFETTI ---------- */
         function confetti() {
             const c = $("#confetti"); const ctx = c.getContext("2d");
@@ -2971,24 +2917,44 @@
         const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add("in") }), { threshold: .08 });
         $$(".reveal").forEach(el => io.observe(el));
 
-        /* ---------- RENDER ALL ---------- */
-        function renderAll() {
-            renderSubjectNav(); renderStats(); renderTrackers(); renderTodos(); renderExams(); renderAnalytics(); renderFocus(); paintStreak();
-        }
-
+   function renderAll() {
+        renderSubjectNav();
+        renderStats();
+        renderTrackers();
+        renderTodos();
+        renderExams();
+        renderAnalytics();
+    }
         /* ---------- BOOT ---------- */
-        async function boot() {
+      async function boot() {
             setSyncBadge("pending");
+
             const ok = await loadFromSupabase();
-            $("#stickyNotes").value = state.notes || "";
+
             renderAll();
-            refreshQuote(); loadWeather(); loadNews();
+
             $("#footerYear").textContent = new Date().getFullYear();
-            if (!SB_READY) toast("Running local-only — add your Supabase anon key in the script to enable cloud sync", "info", "fa-cloud");
-            else if (!ok) toast("Loaded from local cache — check your Supabase tables/keys", "error", "fa-triangle-exclamation");
-            else toast("Synced with Supabase", "success", "fa-cloud-arrow-down");
-        }
-        boot();
+
+            if (!SB_READY) {
+                toast(
+                    "Running local-only — add your Supabase anon key in the script to enable cloud sync",
+                    "info",
+                    "fa-cloud"
+                );
+            } else if (!ok) {
+                toast(
+                    "Loaded from local cache — check your Supabase tables/keys",
+                    "error",
+                    "fa-triangle-exclamation"
+                );
+            } else {
+                toast(
+                    "Synced with Supabase",
+                    "success",
+                    "fa-cloud-arrow-down"
+                );
+            }
+        }  boot();
     </script>
 </body>
 
