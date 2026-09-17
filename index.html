@@ -725,7 +725,7 @@
 /* Todo + exams side by side on desktop */
 .manager-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 24px;
 }
 
@@ -2248,7 +2248,7 @@ html {
             if (!SB_READY) { dot.className = "sync-dot off"; lbl.textContent = "Local only — add anon key"; return }
             if (mode === "pending") { dot.className = "sync-dot pending"; lbl.textContent = "Syncing…"; return }
             if (mode === "error") { dot.className = "sync-dot off"; lbl.textContent = "Sync error"; return }
-            dot.className = "sync-dot on"; lbl.textContent = "Synced to Supabase";
+            dot.className = "sync-dot on"; lbl.textContent = "Synced";
         }
         async function sbUpsert(table, row, opts) {
             if (!sb) { setSyncBadge(); return }
@@ -2949,7 +2949,7 @@ html {
                 );
             } else {
                 toast(
-                    "Synced with Supabase",
+                    "Synced",
                     "success",
                     "fa-cloud-arrow-down"
                 );
